@@ -14,10 +14,10 @@ Coordinate registration for multi-static radar using ellipse intersections. Not 
 - Clone this repository to some directory.
 - Run the docker compose command.
 
-‘’’
+```bash
 sudo git clone http://github.com/30hours/3lips /opt/3lips
 sudo docker compose up -d —build
-‘’’
+```
 
 The API front-end is available at [http://localhost:49156](http://localhost:49156).
 
