@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3lips</title>
+  <!-- load lib js -->
+  <script src="./public/lib/bootstrap-5.2.3.min.js"></script>
+  <!-- load lib css -->
+  <link rel="stylesheet" href="./public/lib/bootstrap-5.2.3.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, select {
+      margin-bottom: 10px;
+    }
+    .custom-location-fields {
+      display: none;
+    }
+    .calculator-form {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    body .jumbotron h1 {
+      font-family: 'Helvetica', sans-serif !important;
+      font-weight: bold;
+      font-size: 3.5rem !important;
+    }
+    @media (min-width: 768px) {
+      body .jumbotron h1 {
+        font-family: 'Helvetica', sans-serif !important;
+        font-weight: bold;
+        font-size: 5rem !important;
+      }
+    }
+  </style>
+</head>
+<body style="background-color:#f78c58;">
+<div class="container-md">
+<div class="row justify-content-center">
+<div class="col-md-6">
+  <div class="jumbotron">
+    <h1 class="display-4 text-center">3lips</h1>
+    <p class="lead">Coordinate registration for multi-static radar using ellipse intersections. Requires input of <a href="https://github.com/30hours/blah2" target="_blank">blah2</a> servers, and choice of algorithm for association and coordinate registration. This program exposes an API endpoint to generate geographic coordinates and a <a href="https://github.com/CesiumGS/cesium" target="_blank">Cesium</a> map for display.</p>
+    <p class="lead">See <a href="https://github.com/30hours/3lips" target="_blank">github.com/30hours/3lips</a> for more details.</p>
+  </div>
+  <div class="calculator-form">
+
+    <form action="/api" method="get">
+
+      <div class="mb-3">
+      <label class="form-label fw-bold">Servers:</label>
+      {% for server in servers %}
+          <button type="button" class="btn btn-success toggle-button active w-100 mb-1" data-toggle="button" aria-pressed="true" server-url="{{ server.url }}" onclick="toggle_button(this)">{{ server.name }}</button>
+          <input type="hidden" name="url" value="{{ server.url }}">
+      {% endfor %}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Associator:</label>
+        <select class="form-select" name="associator">
+          {% for associator in associators %}
+            <option value="{{ associator.id }}">{{ associator.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Coordinate Registration:</label>
+        <select class="form-select" name="associator">
+          {% for coordreg in coordregs %}
+            <option value="{{ coordreg.id }}">{{ coordreg.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-1">
+        <label class="form-label fw-bold">Run:</label>
+        <button type="submit" class="btn btn-dark w-100">API</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="mb-3">
+    <button class="btn btn-dark w-100">Map</button>
+  </div>
+
+</div>
+</div>
+</div>
+<script src="/public/js/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+
+  3lips:
+    restart: always
+    build: .
+    image: 3lips
+    ports:
+      - 49156:5000
+    network_mode: bridge
+    container_name: 3lips
