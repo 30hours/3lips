@@ -57,9 +57,15 @@
       <div class="mb-3">
       <label class="form-label fw-bold">Servers:</label>
       {% for server in servers %}
-          <button type="button" class="btn btn-success toggle-button active w-100 mb-1" data-toggle="button" aria-pressed="true" server-url="{{ server.url }}" onclick="toggle_button(this)">{{ server.name }}</button>
-          <input type="hidden" name="url" value="{{ server.url }}">
+          <button type="button" class="btn btn-success toggle-button active w-100 mb-1" name="url" data-toggle="button" aria-pressed="true" value="{{ server.url }}" onclick="toggle_button(this)">{{ server.name }}</button>
+          <!-- <input type="hidden" name="url" value="{{ server.url }}"> -->
       {% endfor %}
+      <div id="server-list">
+        <!-- Existing or dynamically added server buttons go here -->
+      </div>
+      <!-- Add the new server functionality here -->
+      <button type="button" class="btn btn-primary add-server-btn w-100 mt-2 mb-3" onclick="addNewServer()">Add Server</button>
+        <div class="" id="new-server-container"></div>
       </div>
 
       <div class="mb-3">
@@ -73,9 +79,18 @@
 
       <div class="mb-3">
         <label class="form-label fw-bold">Coordinate Registration:</label>
-        <select class="form-select" name="associator">
+        <select class="form-select" name="coordreg">
           {% for coordreg in coordregs %}
             <option value="{{ coordreg.id }}">{{ coordreg.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">ADSB:</label>
+        <select class="form-select" name="adsb">
+          {% for adsb in adsbs %}
+            <option value="{{ adsb.url }}">{{ adsb.name }}</option>
           {% endfor %}
         </select>
       </div>
@@ -84,11 +99,10 @@
         <label class="form-label fw-bold">Run:</label>
         <button type="submit" class="btn btn-dark w-100">API</button>
       </div>
+      <div class="mb-3">
+        <button type="button" class="btn btn-dark w-100">Map</button>
+      </div>
     </form>
-  </div>
-
-  <div class="mb-3">
-    <button class="btn btn-dark w-100">Map</button>
   </div>
 
 </div>

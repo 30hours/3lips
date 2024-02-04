@@ -14,13 +14,22 @@ associators = [
   {"name": "ADSB Associator", "id": "adsb-associator"}
 ]
 coordregs = [
-  {"name": "Ellipse 2D Conic Intersection", "id": "ellipse-2d-conic-int"}
+  {"name": "Ellipse Analytic Intersection", "id": "ellipse-conic-int"},
+  {"name": "Ellipse Parametric", "id": "ellipse-parametric"},
+  {"name": "Ellipse Parametric (Arc Length)", "id": "ellipse-parametric-arc"},
+  {"name": "Ellipsoid Parametric", "id": "ellipsoid-parametric"},
+  {"name": "Ellipsoid Parametric (Arc Length)", "id": "ellipsoid-parametric-arc"}
+]
+
+adsbs = [
+  {"name": "adsb.30hours.dev", "url": "adsb.30hours.dev"},
+  {"name": "None", "url": ""}
 ]
 
 @app.route("/")
 def index():
     return render_template("index.html", servers=servers, \
-      associators=associators, coordregs=coordregs)
+      associators=associators, coordregs=coordregs, adsbs=adsbs)
 
 # serve static files from the /app/public folder
 @app.route('/public/<path:file>')
@@ -32,7 +41,7 @@ def serve_static(file):
 @app.route("/api")
 def api():
     urls = request.args.getlist("url")
-    data = [{"url": url} for url in urls]
+    data = [{"url": 'http://' + url} for url in urls]
     return jsonify(data)
 
 @app.route("/map")
