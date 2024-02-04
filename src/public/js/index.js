@@ -10,10 +10,12 @@ function toggle_button(button) {
   } else {
     button.classList.add("btn-secondary");
     button.classList.remove("btn-success");
-  }
 
-  // Set the value to server.url when the button is pressed
-  var serverUrl = button.getAttribute('value');
-  button.value = pressed === 'true' ? serverUrl : '';
-  console.log(button.value);
+    // Remove the corresponding hidden input when the button is deselected
+    var serverUrl = button.getAttribute('value');
+    var hiddenInputs = document.querySelectorAll('input[name="url"][value="' + serverUrl + '"]');
+    hiddenInputs.forEach(function (input) {
+      input.parentNode.removeChild(input);
+    });
+  }
 }
