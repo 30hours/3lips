@@ -44,9 +44,11 @@ def api():
     data = [{"url": 'http://' + url} for url in urls]
     return jsonify(data)
 
-@app.route("/map")
-def map_page():
-    return render_template("map.html")
+@app.route("/map/<path:file>")
+def serve_map(file):
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    public_folder = os.path.join(base_dir, 'map')
+    return send_from_directory(public_folder, file)
 
 if __name__ == "__main__":
     app.run(debug=True)

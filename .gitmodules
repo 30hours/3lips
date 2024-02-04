@@ -1,4 +1,0 @@
-[submodule "cesium"]
-	path = src/public/cesium
-	url = https://github.com/CesiumGS/cesium.git
-	branch = 1.114.0
