@@ -1,5 +1,8 @@
 version: '3'
 
+networks:
+    3lips:
+
 services:
 
   3lips:
@@ -8,5 +11,17 @@ services:
     image: 3lips
     ports:
       - 49156:5000
-    network_mode: bridge
+    networks:
+      - 3lips
     container_name: 3lips
+
+  cesium-apache:
+    restart: always
+    build:
+      context: ./cesium
+      dockerfile: Dockerfile
+    image: cesium-apache
+    networks:
+      - 3lips
+    container_name: 3lips-cesium
+
