@@ -14,12 +14,15 @@ servers = [
 associators = [
   {"name": "ADSB Associator", "id": "adsb-associator"}
 ]
+# coordregs = [
+#   {"name": "Ellipse Analytic Intersection", "id": "ellipse-conic-int"},
+#   {"name": "Ellipse Parametric", "id": "ellipse-parametric"},
+#   {"name": "Ellipse Parametric (Arc Length)", "id": "ellipse-parametric-arc"},
+#   {"name": "Ellipsoid Parametric", "id": "ellipsoid-parametric"},
+#   {"name": "Ellipsoid Parametric (Arc Length)", "id": "ellipsoid-parametric-arc"}
+# ]
 coordregs = [
-  {"name": "Ellipse Analytic Intersection", "id": "ellipse-conic-int"},
-  {"name": "Ellipse Parametric", "id": "ellipse-parametric"},
-  {"name": "Ellipse Parametric (Arc Length)", "id": "ellipse-parametric-arc"},
-  {"name": "Ellipsoid Parametric", "id": "ellipsoid-parametric"},
-  {"name": "Ellipsoid Parametric (Arc Length)", "id": "ellipsoid-parametric-arc"}
+  {"name": "Ellipse Parametric", "id": "ellipse-parametric"}
 ]
 
 adsbs = [
