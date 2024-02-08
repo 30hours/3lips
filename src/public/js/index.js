@@ -1,25 +1,3 @@
-// function toggle_button(button) {
-//   button.classList.toggle('active');
-//   var pressed = button.getAttribute('aria-pressed') === 'false' ? 'true' : 'false';
-//   button.setAttribute('aria-pressed', pressed);
-
-//   // fix button states
-//   if (pressed === 'true') {
-//     button.classList.add("btn-success");
-//     button.classList.remove("btn-secondary");
-//   } else {
-//     button.classList.add("btn-secondary");
-//     button.classList.remove("btn-success");
-
-//     // Remove the corresponding hidden input when the button is deselected
-//     var serverUrl = button.getAttribute('value');
-//     var hiddenInputs = document.querySelectorAll('input[name="url"][value="' + serverUrl + '"]');
-//     hiddenInputs.forEach(function (input) {
-//       input.parentNode.removeChild(input);
-//     });
-//   }
-// }
-
 function toggle_button(button) {
   button.classList.toggle('active');
   var pressed = button.getAttribute('aria-pressed') === 'false' ? 'true' : 'false';
@@ -32,12 +10,12 @@ function toggle_button(button) {
 
     // Add the hidden input when the button is pressed
     var serverUrl = button.getAttribute('value');
-    var inputExists = document.querySelector('input[name="url"][value="' + serverUrl + '"]');
+    var inputExists = document.querySelector('input[name="server"][value="' + serverUrl + '"]');
     
     if (!inputExists) {
       var hiddenInput = document.createElement('input');
       hiddenInput.setAttribute('type', 'hidden');
-      hiddenInput.setAttribute('name', 'url');
+      hiddenInput.setAttribute('name', 'server');
       hiddenInput.setAttribute('value', serverUrl);
       document.querySelector('form').appendChild(hiddenInput);
     }
@@ -47,7 +25,7 @@ function toggle_button(button) {
 
     // Remove the corresponding hidden input when the button is deselected
     var serverUrl = button.getAttribute('value');
-    var hiddenInputs = document.querySelectorAll('input[name="url"][value="' + serverUrl + '"]');
+    var hiddenInputs = document.querySelectorAll('input[name="server"][value="' + serverUrl + '"]');
     
     hiddenInputs.forEach(function (input) {
       // Check if the input element exists before removing it

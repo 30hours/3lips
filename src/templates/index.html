@@ -57,8 +57,8 @@
       <div class="mb-3">
       <label class="form-label fw-bold">Servers:</label>
       {% for server in servers %}
-          <button type="button" class="btn btn-success toggle-button active w-100 mb-1" name="url" data-toggle="button" aria-pressed="true" value="{{ server.url }}" onclick="toggle_button(this)">{{ server.name }}</button>
-          <input type="hidden" name="url" value="{{ server.url }}">
+          <button type="button" class="btn btn-success toggle-button active w-100 mb-1" name="server" data-toggle="button" aria-pressed="true" value="{{ server.url }}" onclick="toggle_button(this)">{{ server.name }}</button>
+          <input type="hidden" name="server" value="{{ server.url }}">
       {% endfor %}
       </div>
 
