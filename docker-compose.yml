@@ -15,6 +15,8 @@ services:
       - 49156:5000
     networks:
       - 3lips
+    volumes:
+      - ./common:/app/common
     container_name: 3lips-api
 
   event:
@@ -26,7 +28,7 @@ services:
     networks:
       - 3lips
     volumes:
-      - ./db:/app/db
+      - ./common:/app/common
     container_name: 3lips-event
 
   cesium-apache:
@@ -37,6 +39,4 @@ services:
     image: cesium-apache
     networks:
       - 3lips
-    volumes:
-      - ./db:/app/db
     container_name: 3lips-cesium

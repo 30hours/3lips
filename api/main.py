@@ -6,15 +6,11 @@ import sqlite3
 import requests
 import time
 import socket
+import asyncio
 
-from util.Sqlite import Sqlite
+from common.Message import Message
 
 app = Flask(__name__)
-
-# init db
-# sqlite = Sqlite('./db/3lips.db')
-# schema = "api TEXT PRIMARY KEY, timestamp INTEGER NOT NULL"
-# sqlite.create_table("data", schema)
 
 # store state data
 servers = [
@@ -40,6 +36,9 @@ adsbs = [
   {"name": "None", "url": ""}
 ]
 
+# init messaging
+message = Message('event', 6969)
+
 @app.route("/")
 def index():
     return render_template("index.html", servers=servers, \
@@ -55,9 +54,7 @@ def serve_static(file):
 @app.route("/api")
 def api():
     api = request.query_string.decode('utf-8')
-    # timestamp = time.time()*1000
-    # sqlite.add_entry("data", api, timestamp)
-    send_data_to_event(api)
+    message.send_message(api)
     
     urls = request.args.getlist("url")
     data = [{"url": 'http://' + url} for url in urls]
@@ -85,12 +82,6 @@ def serve_cesium_content(file):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching content from Apache server: {e}")
     return Response('Error fetching content from Apache server', status=500, content_type='text/plain')
-
-def send_data_to_event(data):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        # Use the service name 'event' as specified in your Docker Compose file
-        s.connect(('event', 12345))
-        s.sendall(data.encode())
 
 if __name__ == "__main__":
     app.run(debug=True)
