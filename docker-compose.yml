@@ -5,15 +5,29 @@ networks:
 
 services:
 
-  3lips:
+  api:
     restart: always
-    build: .
-    image: 3lips
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+    image: 3lips-api
     ports:
       - 49156:5000
     networks:
       - 3lips
-    container_name: 3lips
+    container_name: 3lips-api
+
+  event:
+    restart: always
+    build:
+      context: ./event
+      dockerfile: Dockerfile
+    image: 3lips-event
+    networks:
+      - 3lips
+    volumes:
+      - ./db:/app/db
+    container_name: 3lips-event
 
   cesium-apache:
     restart: always
@@ -23,5 +37,6 @@ services:
     image: cesium-apache
     networks:
       - 3lips
+    volumes:
+      - ./db:/app/db
     container_name: 3lips-cesium
-

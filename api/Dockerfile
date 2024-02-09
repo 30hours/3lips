@@ -1,7 +1,7 @@
 FROM python:3.9-slim
 
 WORKDIR /app
-COPY src /app
+COPY api /app
 
 # install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
