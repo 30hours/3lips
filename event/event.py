@@ -1,8 +1,6 @@
 import asyncio
-import sqlite3
 import requests
 import threading
-import socket
 import asyncio
 import time
 import copy

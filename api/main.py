@@ -2,12 +2,9 @@
 
 from flask import Flask, Response, render_template, request, redirect, jsonify, send_from_directory
 import os
-import sqlite3
 import requests
 import time
-import socket
 import asyncio
-import threading
 
 from common.Message import Message
 
