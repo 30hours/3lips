@@ -56,14 +56,12 @@ class Message:
         """
 
         with conn:
-            print(f"Connected by {addr}")
 
             while True:
                 data = conn.recv(1024)
                 if not data:
                     break
                 decoded_data = data.decode()
-                print(f"Received data: {decoded_data}")
 
                 # Call the callback function if set
                 if self.callback_message_received:

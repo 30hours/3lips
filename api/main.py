@@ -89,4 +89,4 @@ def serve_cesium_content(file):
     return Response('Error fetching content from Apache server', status=500, content_type='text/plain')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
