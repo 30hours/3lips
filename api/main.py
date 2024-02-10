@@ -7,6 +7,7 @@ import requests
 import time
 import socket
 import asyncio
+import threading
 
 from common.Message import Message
 
@@ -36,8 +37,12 @@ adsbs = [
   {"name": "None", "url": ""}
 ]
 
+# message received callback
+async def callback_message_received(msg):
+    print(f"Callback: Received message in main.py: {msg}", flush=True)
+
 # init messaging
-message = Message('event', 6969)
+message_api_request = Message('event', 6969)
 
 @app.route("/")
 def index():
@@ -54,11 +59,11 @@ def serve_static(file):
 @app.route("/api")
 def api():
     api = request.query_string.decode('utf-8')
-    message.send_message(api)
-    
+    reply = message_api_request.send_message(api)
+    print(reply, flush=True)
     urls = request.args.getlist("url")
     data = [{"url": 'http://' + url} for url in urls]
-    return jsonify(data)
+    return reply
 
 @app.route("/map/<path:file>")
 def serve_map(file):

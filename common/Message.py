@@ -67,7 +67,9 @@ class Message:
 
                 # Call the callback function if set
                 if self.callback_message_received:
-                    asyncio.run(self.callback_message_received(decoded_data))
+                    reply = asyncio.run(self.callback_message_received(decoded_data))
+                    if reply:
+                      conn.sendall(reply.encode())
 
     def send_message(self, message):
 
@@ -78,8 +80,14 @@ class Message:
         """
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-            client_socket.connect((self.host, self.port))
-            client_socket.sendall(message.encode())
+            client_socket.settimeout(3)
+            try:
+                client_socket.connect((self.host, self.port))
+                client_socket.sendall(message.encode())
+                reply = client_socket.recv(1024).decode()
+                return reply
+            except ConnectionRefusedError:
+                print(f"Connection to {self.host}:{self.port} refused.")
 
     def set_callback_message_received(self, callback):
 
