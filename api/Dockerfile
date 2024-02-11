@@ -10,7 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 # define environment variable
-ENV FLASK_APP=main.py
+ENV FLASK_APP=api.py
 
 # run Gunicorn instead of the default Flask development server
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]

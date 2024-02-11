@@ -81,9 +81,21 @@ async def event():
     # main processing
     for item in api_event:
 
-      for radar in item["server"]:
+      # associator selection
+      if item["associator"] == "adsb-associator":
+        associator = adsbAssociator
+      else:
+        print("Error: Associator invalid.")
+        return
 
-        print(radar, flush=True)
+      # coord reg selection
+      if item["coordreg"] == "ellipse-parametric":
+        coordreg = ellipseParametric
+      else:
+        print("Error: Coord reg invalid.")
+        return
+
+    print(radar, flush=True)
 
     # delete old API requests
     api_event = [

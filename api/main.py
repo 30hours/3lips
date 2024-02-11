@@ -1,4 +1,8 @@
-# main.py
+"""
+@file api.py
+@brief API for 3lips.
+@author 30hours
+"""
 
 from flask import Flask, Response, render_template, request, redirect, jsonify, send_from_directory
 import os

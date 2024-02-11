@@ -7,8 +7,9 @@ class AdsbAssociator:
 
     """
     @class AdsbAssociator
-    @brief A class for associating a detection with ADS-B truth.
-    @details Uses radar detection data from a blah2 server.
+    @brief A class for associating detections of the same target.
+    @details Girst associate ADS-B truth with each radar detection.
+    Then associate over multiple radars.
     @see blah2 at https://github.com/30hours/blah2.
     Uses truth data in delay-Doppler space from an adsb2dd server.
     @see adsb2dd at https://github.com/30hours/adsb2dd.
