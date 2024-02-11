@@ -81,6 +81,14 @@ async def event():
     # main processing
     for item in api_event:
 
+      # extract dict for item
+      #radar_dict_item = {key: None for key in item["server"]}
+      radar_dict_item =  {
+          key: radar_dict[key] 
+          for key in item["server"] 
+          if key in radar_dict
+}
+
       # associator selection
       if item["associator"] == "adsb-associator":
         associator = adsbAssociator
@@ -95,7 +103,7 @@ async def event():
         print("Error: Coord reg invalid.")
         return
 
-    print(radar, flush=True)
+      associated_dets = associator.process(item["server"], radar_dict_item)
 
     # delete old API requests
     api_event = [
