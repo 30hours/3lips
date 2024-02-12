@@ -133,3 +133,110 @@ var viewer = new Cesium.Viewer("cesiumContainer", {
 	selectionIndicator: false
 });
 
+/**
+ * @brief Adds a point to Cesium viewer with specified parameters.
+ * @param {number} latitude - The latitude of the point in degrees.
+ * @param {number} longitude - The longitude of the point in degrees.
+ * @param {number} altitude - The altitude of the point in meters.
+ * @param {string} pointName - The name of the point.
+ * @param {string} pointColor - The color of the point in CSS color string format.
+ * @param {number} timestamp - The timestamp in UNIX milliseconds indicating when the point was added.
+ * @returns {Entity} The Cesium Entity representing the added point.
+ */
+ function addPoint(latitude, longitude, altitude, pointName, pointColor, pointSize, type, timestamp) {
+  // Convert latitude, longitude, altitude to Cartesian coordinates (ECEF)
+  const position = Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude);
+
+  // Create a point entity
+  const pointEntity = viewer.entities.add({
+      position,
+      point: {
+          color: Cesium.Color.fromCssColorString(pointColor),
+          pixelSize: pointSize,
+      },
+      label: (type === "radar") ? {
+          text: pointName,
+          showBackground: true,
+          backgroundColor: Cesium.Color.BLACK,
+          font: '14px sans-serif',
+          pixelOffset: new Cesium.Cartesian2(0, -20),
+      } : undefined,
+      properties: {
+          timestamp,
+          type,
+      },
+  });
+
+  return pointEntity;
+}
+
+window.addEventListener('load', function () {
+
+  // add radar points
+  const radar_names = new URLSearchParams(
+    window.location.search).get('url').split('&');
+  var radar_config_url = radar_names.map(
+    url => `http://${url}/api/config`);
+  if (this.window.location.protocol === "https:") {
+    radar_config_url = radar_config_url.map(
+      url => url.replace(/^http:/, 'https:'));
+  }
+  var style_radar = {};
+  style_radar.color = 'rgba(0, 0, 0, 1.0)';
+  style_radar.pointSize = 10;
+  style_radar.type = "radar";
+  style_radar.timestamp = Date.now();
+  radar_config_url.forEach(url => {
+    console.log(url);
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // add radar rx and tx
+        addPoint(
+          data.location.rx.latitude, 
+          data.location.rx.longitude, 
+          data.location.rx.altitude, 
+          data.location.rx.name, 
+          style_radar.color, 
+          style_radar.pointSize, 
+          style_radar.type, 
+          style_radar.timestamp
+        );
+        addPoint(
+          data.location.tx.latitude, 
+          data.location.tx.longitude, 
+          data.location.tx.altitude, 
+          data.location.tx.name, 
+          style_radar.color, 
+          style_radar.pointSize, 
+          style_radar.type, 
+          style_radar.timestamp
+        );
+      })
+      .catch(error => {
+        // Handle errors during fetch
+        console.error('Error during fetch:', error);
+      });
+  });
+
+  // get detection data URL
+
+  // get truth URL
+
+  // call event loop
+  event_loop();
+
+})
+
+function event_loop() {
+
+  //console.log(Date.now());
+  
+  setTimeout(event_loop, 1000);
+
+}

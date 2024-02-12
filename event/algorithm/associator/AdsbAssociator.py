@@ -4,17 +4,19 @@
 """
 
 import requests
+import math
 
 class AdsbAssociator:
 
     """
     @class AdsbAssociator
     @brief A class for associating detections of the same target.
-    @details Girst associate ADS-B truth with each radar detection.
+    @details First associate ADS-B truth with each radar detection.
     Then associate over multiple radars.
     @see blah2 at https://github.com/30hours/blah2.
     Uses truth data in delay-Doppler space from an adsb2dd server.
     @see adsb2dd at https://github.com/30hours/adsb2dd.
+    @todo Add adjustable window for associating truth/detections.
     """
 
     def __init__(self):
@@ -33,42 +35,73 @@ class AdsbAssociator:
         """
 
         assoc_detections = {}
+        assoc_detections_radar = []
 
         for radar in radar_list:
 
-          if radar_data[radar]["config"] is not None:
+            if radar_data[radar]["config"] is not None:
 
-            # get URL for adsb2truth
-            url = self.generate_api_url(radar, radar_data[radar])
+                # get URL for adsb2truth
+                url = self.generate_api_url(radar, radar_data[radar])
 
-            # get ADSB detections
-            try:
-                response = requests.get(url, timeout=1)
-                response.raise_for_status()
-                data = response.json()
-                adsb_detections = data
-            except requests.exceptions.RequestException as e:
-                print(f"Error fetching data from {url}: {e}")
-                adsb_detections = None
+                # get ADSB detections
+                try:
+                    response = requests.get(url, timeout=1)
+                    response.raise_for_status()
+                    data = response.json()
+                    adsb_detections = data
+                except requests.exceptions.RequestException as e:
+                    print(f"Error fetching data from {url}: {e}")
+                    adsb_detections = None
+                    continue
 
-            # associate radar and truth
-            print(adsb_detections, flush=True)
+                # associate radar and truth
+                assoc_detections_radar.append(self.process_1_radar(
+                  radar, radar_data[radar]["detection"], adsb_detections))
+
+          # associate detections between radars
+
+        print(assoc_detections_radar, flush=True)
 
 
 
-        #print(radar_list, flush=True)
-        #print(radar_data, flush=True)
-
-
-
-    def process_1_radar(self, radar_detections, adsb_detections):
+    def process_1_radar(self, radar, radar_detections, adsb_detections):
 
         """
         @brief Associate detections between 1 radar/truth pair.
-        @param radar_detections (str): JSON of blah2 radar detections.
-        @param adsb_detections (str): JSON of adsb2dd truth detections.
-        @return str: JSON of associated detections.
+        @details Output 1 detection per truth point.
+        @param radar (str): Name of radar to process.
+        @param radar_detections (dict): blah2 radar detections.
+        @param adsb_detections (dict): adsb2dd truth detections.
+        @return dict: Associated detections.
         """
+
+        assoc_detections = {}
+        distance_window = 10
+
+        for aircraft in adsb_detections:
+
+            if 'delay' in radar_detections:
+
+                if 'delay' in adsb_detections[aircraft] and len(radar_detections['delay']) >= 1:
+
+                    # distance from aircraft to all detections
+                    closest_point, distance = self.closest_point(
+                      adsb_detections[aircraft]['delay'], 
+                      adsb_detections[aircraft]['doppler'],
+                      radar_detections['delay'],
+                      radar_detections['doppler']
+                    )
+
+                    if distance < distance_window:
+
+                        assoc_detections[aircraft] = {
+                          'radar': radar,
+                          'delay': closest_point[0],
+                          'doppler': closest_point[1]
+                        }
+
+        return assoc_detections
 
     def generate_api_url(self, radar, radar_data):
 
@@ -99,8 +132,23 @@ class AdsbAssociator:
             "&tx=" + str(tx_lat) + "," + 
             str(tx_lon) + "," + 
             str(tx_alt) +
-            "&fc=" + str(fc) +
+            "&fc=" + str(fc/1000000) +
             "&server=" + "http://" + str(adsb)
         )
 
         return api_query
+
+    def closest_point(self, x1, y1, x_coords, y_coords):
+
+        x1, y1 = float(x1), float(y1)
+        x_coords = [float(x) for x in x_coords]
+        y_coords = [float(y) for y in y_coords]
+
+        distances = [math.sqrt((x - x1)**2 + (y - y1)**2) for x, y in zip(x_coords, y_coords)]
+        min_distance_index = distances.index(min(distances))
+        
+        closest_x = x_coords[min_distance_index]
+        closest_y = y_coords[min_distance_index]
+        distance = distances[min_distance_index]
+        
+        return [closest_x, closest_y], distance

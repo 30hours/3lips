@@ -76,8 +76,6 @@ async def event():
             "config": radar_config[i]
         }
 
-    print(radar_dict, flush=True)
-
     # main processing
     for item in api_event:
 
