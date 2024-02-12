@@ -197,6 +197,7 @@ window.addEventListener('load', function () {
       })
       .then(data => {
         // add radar rx and tx
+        // todo: check not duplicating points
         addPoint(
           data.location.rx.latitude, 
           data.location.rx.longitude, 
