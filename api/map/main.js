@@ -171,6 +171,15 @@ var viewer = new Cesium.Viewer("cesiumContainer", {
   return pointEntity;
 }
 
+// global vars
+var adsb_url;
+var adsbEntities = {};
+
+var style_adsb = {};
+style_adsb.color = 'rgba(255, 0, 0, 0.5)';
+style_adsb.pointSize = 8;
+style_adsb.type = "adsb";
+
 window.addEventListener('load', function () {
 
   // add radar points
@@ -231,18 +240,98 @@ window.addEventListener('load', function () {
   // get detection data URL
 
   // get truth URL
+  adsb_url = new URLSearchParams(
+    window.location.search).get('adsb').split('&');
+  adsb_url = adsb_url.map(
+    url => `http://${url}/data/aircraft.json`);
+  if (this.window.location.protocol === "https:") {
+    adsb_url = adsb_url.map(
+      url => url.replace(/^http:/, 'https:'));
+  }
+  adsb_url = adsb_url[0];
+  console.log(adsb_url);
 
-  // call event loop
-  event_loop();
+  // call event loops
+  event_adsb();
+  event_radar();
 
 })
 
-function event_loop() {
+// Function to process aircraft data
+function processAircraftData(aircraftData) {
+  const icao = aircraftData.hex;
+  const flight = aircraftData.flight;
+  const lat = aircraftData.lat;
+  const lon = aircraftData.lon;
+  const alt = aircraftData.alt_baro;
+  const seen_pos = aircraftData.seen_pos;
 
-  //console.log(Date.now());
-  
-  setTimeout(event_loop, 1000);
+  // Check if the aircraft has valid position data
+  if (lat !== undefined && lon !== undefined && alt !== undefined && seen_pos < 10) {
+    addPoint(lat, lon, alt, flight, 'rgba(255, 0, 0, 0.5)', 10, "adsb", Date.now());
+  }
+}
 
+function removeEntitiesOlderThan(entityType, maxAgeSeconds) {
+  viewer.entities.values.forEach((entity) => {
+    const type = entity.properties["type"].getValue();
+    const timestamp = entity.properties["timestamp"].getValue();
+    console.log(type);
+    console.log(timestamp);
+    if (type === entityType & Date.now()-timestamp > maxAgeSeconds) {
+        viewer.entities.remove(entity);
+    }
+  });
+}
+
+// Function to update aircraft points
+function updateAircraftPoints(data) {
+  // Clear existing points
+  //viewer.entities.removeAll();
+  //removeEntitiesByType("adsb");
+  removeEntitiesOlderThan("adsb", 10);
+
+  // Process aircraft data and add points
+  const aircraft = data.aircraft || [];
+  aircraft.forEach(processAircraftData);
+}
+
+function removeEntitiesByType(entityType) {
+  viewer.entities.values.forEach((entity) => {
+    if (entity.properties["type"].getValue() === entityType) {
+      viewer.entities.remove(entity);
+    }
+  });
+}
+
+
+function event_adsb() {
+
+  fetch(adsb_url)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    // Update aircraft points based on new data
+    updateAircraftPoints(data);
+  })
+  .catch(error => {
+    // Handle errors during fetch
+    console.error('Error during fetch:', error);
+  })
+  .finally(() => {
+    // Schedule the next fetch after a delay (e.g., 5 seconds)
+    setTimeout(event_adsb, 1000);
+  });
+
+}
+
+function event_radar() {
+
+  setTimeout(event_radar, 1000);
 }
 
 function doesEntityNameExist(name) {
