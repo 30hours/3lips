@@ -149,6 +149,7 @@ var viewer = new Cesium.Viewer("cesiumContainer", {
 
   // Create a point entity
   const pointEntity = viewer.entities.add({
+      name: pointName,
       position,
       point: {
           color: Cesium.Color.fromCssColorString(pointColor),
@@ -187,7 +188,6 @@ window.addEventListener('load', function () {
   style_radar.type = "radar";
   style_radar.timestamp = Date.now();
   radar_config_url.forEach(url => {
-    console.log(url);
     fetch(url)
       .then(response => {
         if (!response.ok) {
@@ -197,27 +197,30 @@ window.addEventListener('load', function () {
       })
       .then(data => {
         // add radar rx and tx
-        // todo: check not duplicating points
-        addPoint(
-          data.location.rx.latitude, 
-          data.location.rx.longitude, 
-          data.location.rx.altitude, 
-          data.location.rx.name, 
-          style_radar.color, 
-          style_radar.pointSize, 
-          style_radar.type, 
-          style_radar.timestamp
-        );
-        addPoint(
-          data.location.tx.latitude, 
-          data.location.tx.longitude, 
-          data.location.tx.altitude, 
-          data.location.tx.name, 
-          style_radar.color, 
-          style_radar.pointSize, 
-          style_radar.type, 
-          style_radar.timestamp
-        );
+        if (!doesEntityNameExist(data.location.rx.name)) {
+          addPoint(
+            data.location.rx.latitude, 
+            data.location.rx.longitude, 
+            data.location.rx.altitude, 
+            data.location.rx.name, 
+            style_radar.color, 
+            style_radar.pointSize, 
+            style_radar.type, 
+            style_radar.timestamp
+          );
+        }
+        if (!doesEntityNameExist(data.location.tx.name)) {
+          addPoint(
+            data.location.tx.latitude, 
+            data.location.tx.longitude, 
+            data.location.tx.altitude, 
+            data.location.tx.name, 
+            style_radar.color, 
+            style_radar.pointSize, 
+            style_radar.type, 
+            style_radar.timestamp
+          );
+        }
       })
       .catch(error => {
         // Handle errors during fetch
@@ -240,4 +243,16 @@ function event_loop() {
   
   setTimeout(event_loop, 1000);
 
+}
+
+function doesEntityNameExist(name) {
+  
+  // loop over all entities in the viewer
+  viewer.entities.values.forEach((entity) => {
+    if (entity.name === name) {
+      return true;
+    }
+  });
+
+  return false;
 }
