@@ -257,81 +257,52 @@ window.addEventListener('load', function () {
 
 })
 
-// Function to process aircraft data
-function processAircraftData(aircraftData) {
-  const icao = aircraftData.hex;
-  const flight = aircraftData.flight;
-  const lat = aircraftData.lat;
-  const lon = aircraftData.lon;
-  const alt = aircraftData.alt_baro;
-  const seen_pos = aircraftData.seen_pos;
-
-  // Check if the aircraft has valid position data
-  if (lat !== undefined && lon !== undefined && alt !== undefined && seen_pos < 10) {
-    addPoint(lat, lon, alt, flight, 'rgba(255, 0, 0, 0.5)', 10, "adsb", Date.now());
-  }
-}
-
 function removeEntitiesOlderThan(entityType, maxAgeSeconds) {
-  viewer.entities.values.forEach((entity) => {
+
+  var entities = viewer.entities.values;
+  for (var i = entities.length - 1; i >= 0; i--) {
+    var entity = entities[i];
     const type = entity.properties["type"].getValue();
     const timestamp = entity.properties["timestamp"].getValue();
-    console.log(type);
-    console.log(timestamp);
-    if (type === entityType & Date.now()-timestamp > maxAgeSeconds) {
+    if (entity.properties && entity.properties["type"] && 
+      entity.properties["type"].getValue() === entityType &&
+      Date.now()-timestamp > maxAgeSeconds*1000) {
         viewer.entities.remove(entity);
     }
-  });
+  }
+
 }
 
-// Function to update aircraft points
-function updateAircraftPoints(data) {
-  // Clear existing points
-  //viewer.entities.removeAll();
-  //removeEntitiesByType("adsb");
-  removeEntitiesOlderThan("adsb", 10);
+function removeEntitiesOlderThanAndFade(entityType, maxAgeSeconds, baseAlpha) {
 
-  // Process aircraft data and add points
-  const aircraft = data.aircraft || [];
-  aircraft.forEach(processAircraftData);
+  var entities = viewer.entities.values;
+  for (var i = entities.length - 1; i >= 0; i--) {
+    var entity = entities[i];
+    const type = entity.properties["type"].getValue();
+    const timestamp = entity.properties["timestamp"].getValue();
+    if (entity.properties && entity.properties["type"] && 
+      entity.properties["type"].getValue() === entityType &&
+      Date.now()-timestamp > maxAgeSeconds*1000) {
+        viewer.entities.remove(entity);
+    }
+    else {
+      entity.point.color = new Cesium.Color.fromAlpha(
+        entity.point.color.getValue(), baseAlpha*(1-(Date.now()-timestamp)/(maxAgeSeconds*1000)));
+    }
+  }
+
 }
 
 function removeEntitiesByType(entityType) {
-  viewer.entities.values.forEach((entity) => {
-    if (entity.properties["type"].getValue() === entityType) {
-      viewer.entities.remove(entity);
+
+  var entities = viewer.entities.values;
+  for (var i = entities.length - 1; i >= 0; i--) {
+    var entity = entities[i];
+    if (entity.properties && entity.properties["type"] && 
+      entity.properties["type"].getValue() === entityType) {
+        viewer.entities.remove(entity);
     }
-  });
-}
-
-
-function event_adsb() {
-
-  fetch(adsb_url)
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  })
-  .then(data => {
-    // Update aircraft points based on new data
-    updateAircraftPoints(data);
-  })
-  .catch(error => {
-    // Handle errors during fetch
-    console.error('Error during fetch:', error);
-  })
-  .finally(() => {
-    // Schedule the next fetch after a delay (e.g., 5 seconds)
-    setTimeout(event_adsb, 1000);
-  });
-
-}
-
-function event_radar() {
-
-  setTimeout(event_radar, 1000);
+  }
 }
 
 function doesEntityNameExist(name) {
