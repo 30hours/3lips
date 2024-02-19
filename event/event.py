@@ -29,8 +29,6 @@ async def event():
 
     global api
     timestamp = int(time.time()*1000)
-
-    # main event loop
     api_event = copy.copy(api)
 
     # list all blah2 radars
@@ -80,7 +78,6 @@ async def event():
     for item in api_event:
 
       # extract dict for item
-      #radar_dict_item = {key: None for key in item["server"]}
       radar_dict_item =  {
           key: radar_dict[key] 
           for key in item["server"] 
@@ -101,7 +98,13 @@ async def event():
         print("Error: Coord reg invalid.")
         return
 
+      # processing
       associated_dets = associator.process(item["server"], radar_dict_item)
+      localised_dets = coordreg.process(associated_dets, radar_dict_item)
+      
+      # output data to API
+      item["detections_associated"] = associated_dets
+      item["detections_localised"] = localised_dets
 
     # delete old API requests
     api_event = [

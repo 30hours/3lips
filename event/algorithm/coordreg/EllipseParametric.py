@@ -18,7 +18,7 @@ class EllipseParametric:
         @brief Constructor for the EllipseParametric class.
         """
 
-    def process(self, assoc_detections):
+    def process(self, assoc_detections, radar_data):
 
         """
         @brief Perform coord registration using the ellipse parametric method.
@@ -28,5 +28,9 @@ class EllipseParametric:
         @param adsb_detections (str): JSON of adsb2dd truth detections.
         @return str: JSON of associated detections.
         """
+
+        output = {}
+
+        return output
 
         

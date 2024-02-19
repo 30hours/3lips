@@ -184,7 +184,8 @@ window.addEventListener('load', function () {
 
   // add radar points
   const radar_names = new URLSearchParams(
-    window.location.search).get('url').split('&');
+    window.location.search).getAll('url');
+  console.log(radar_names);
   var radar_config_url = radar_names.map(
     url => `http://${url}/api/config`);
   if (this.window.location.protocol === "https:") {
@@ -249,7 +250,6 @@ window.addEventListener('load', function () {
       url => url.replace(/^http:/, 'https:'));
   }
   adsb_url = adsb_url[0];
-  console.log(adsb_url);
 
   // call event loops
   event_adsb();
@@ -306,13 +306,10 @@ function removeEntitiesByType(entityType) {
 }
 
 function doesEntityNameExist(name) {
-  
-  // loop over all entities in the viewer
-  viewer.entities.values.forEach((entity) => {
+  for (const entity of viewer.entities.values) {
     if (entity.name === name) {
       return true;
     }
-  });
-
+  }
   return false;
 }

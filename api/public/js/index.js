@@ -45,7 +45,7 @@ document.getElementById('buttonMap').addEventListener('click', function() {
   var adsb = document.querySelector('[name="adsb"]').value;
 
   // Construct the URL with the form values
-  var apiUrl = '?url=' + Array.from(servers).map(server => server.value).join('&');
+  var apiUrl = '?url=' + Array.from(servers).map(server => server.value).join('&url=');
   var mapUrl = '/map/index.html' + apiUrl + '&associator=' + associator + '&coordreg=' + coordreg + '&adsb=' + adsb;
 
   // Redirect to the constructed URL

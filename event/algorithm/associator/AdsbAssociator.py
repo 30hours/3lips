@@ -59,11 +59,17 @@ class AdsbAssociator:
                 assoc_detections_radar.append(self.process_1_radar(
                   radar, radar_data[radar]["detection"], adsb_detections))
 
-          # associate detections between radars
+        # associate detections between radars
+        output = {}
+        for entry in assoc_detections_radar:
+            for key, value in entry.items():
+                if key not in output:
+                    output[key] = [value]
+                else:
+                    output[key].append(value)
+        output = {key: values for key, values in output.items() if len(values) > 1}
 
-        print(assoc_detections_radar, flush=True)
-
-
+        return output
 
     def process_1_radar(self, radar, radar_detections, adsb_detections):
 
@@ -120,7 +126,11 @@ class AdsbAssociator:
         tx_lon = radar_data['config']['location']['tx']['longitude']
         tx_alt = radar_data['config']['location']['tx']['altitude']
         fc = radar_data['config']['capture']['fc']
-        adsb = radar_data['config']['truth']['adsb']['ip']
+
+        if (radar == "radar5.30hours.dev"):
+          adsb = radar_data['config']['truth']['adsb']['ip']
+        else:
+          adsb = radar_data['config']['truth']['adsb']['tar1090']
 
         api_url = "http://adsb2dd.30hours.dev/api/dd"
 
