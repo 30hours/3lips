@@ -14,7 +14,7 @@ import json
 import hashlib
 
 from algorithm.associator.AdsbAssociator import AdsbAssociator
-from algorithm.coordreg.EllipseParametric import EllipseParametric
+from algorithm.coordreg.EllipsoidParametric import EllipsoidParametric
 from common.Message import Message
 
 # init event loop
@@ -23,7 +23,7 @@ api = []
 # init config
 tDelete = 60
 adsbAssociator = AdsbAssociator()
-ellipseParametric = EllipseParametric()
+ellipsoidParametric = EllipsoidParametric()
 
 async def event():
 
@@ -92,8 +92,8 @@ async def event():
         return
 
       # coord reg selection
-      if item["coordreg"] == "ellipse-parametric":
-        coordreg = ellipseParametric
+      if item["coordreg"] == "ellipsoid-parametric":
+        coordreg = ellipsoidParametric
       else:
         print("Error: Coord reg invalid.")
         return

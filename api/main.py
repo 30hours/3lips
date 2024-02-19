@@ -30,7 +30,7 @@ associators = [
 #   {"name": "Ellipsoid Parametric (Arc Length)", "id": "ellipsoid-parametric-arc"}
 # ]
 coordregs = [
-  {"name": "Ellipse Parametric", "id": "ellipse-parametric"}
+  {"name": "Ellipsoid Parametric", "id": "ellipsoid-parametric"}
 ]
 
 adsbs = [
