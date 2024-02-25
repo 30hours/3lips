@@ -39,7 +39,10 @@ class AdsbAssociator:
 
         for radar in radar_list:
 
-            if radar_data[radar]["config"] is not None:
+            valid_config = radar_data[radar]["config"] is not None
+            valid_detection = radar_data[radar]["detection"] is not None
+            
+            if valid_config and valid_detection:
 
                 # get URL for adsb2truth
                 url = self.generate_api_url(radar, radar_data[radar])
@@ -127,10 +130,7 @@ class AdsbAssociator:
         tx_alt = radar_data['config']['location']['tx']['altitude']
         fc = radar_data['config']['capture']['fc']
 
-        if (radar == "radar5.30hours.dev"):
-          adsb = radar_data['config']['truth']['adsb']['ip']
-        else:
-          adsb = radar_data['config']['truth']['adsb']['tar1090']
+        adsb = radar_data['config']['truth']['adsb']['tar1090']
 
         api_url = "http://adsb2dd.30hours.dev/api/dd"
 

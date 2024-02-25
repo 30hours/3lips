@@ -17,6 +17,9 @@ from algorithm.associator.AdsbAssociator import AdsbAssociator
 from algorithm.coordreg.EllipsoidParametric import EllipsoidParametric
 from common.Message import Message
 
+from data.Ellipsoid import Ellipsoid
+from algorithm.geometry.Geometry import Geometry
+
 # init event loop
 api = []
 
@@ -101,7 +104,27 @@ async def event():
       # processing
       associated_dets = associator.process(item["server"], radar_dict_item)
       localised_dets = coordreg.process(associated_dets, radar_dict_item)
-      
+
+      # tmp test
+      localised_dets = {}
+      localised_dets["test"] = {}
+      x_tx, y_tx, z_tx = Geometry.lla2ecef(
+          radar_dict_item['radar4.30hours.dev']["config"]['location']['tx']['latitude'],
+          radar_dict_item['radar4.30hours.dev']["config"]['location']['tx']['longitude'],
+          radar_dict_item['radar4.30hours.dev']["config"]['location']['tx']['altitude']
+      )
+      x_rx, y_rx, z_rx = Geometry.lla2ecef(
+          radar_dict_item['radar4.30hours.dev']["config"]['location']['rx']['latitude'],
+          radar_dict_item['radar4.30hours.dev']["config"]['location']['rx']['longitude'],
+          radar_dict_item['radar4.30hours.dev']["config"]['location']['rx']['altitude']
+      )
+      ellipsoid = Ellipsoid(
+          [x_tx, y_tx, z_tx],
+          [x_rx, y_rx, z_rx],
+          'radar4.30hours.dev'
+      )
+      localised_dets["test"]["points"] = ellipsoidParametric.sample(ellipsoid, 10000, 5)
+
       # output data to API
       item["detections_associated"] = associated_dets
       item["detections_localised"] = localised_dets
@@ -154,6 +177,8 @@ async def callback_message_received(msg):
           else:
               api[-1][key] = value
       api[-1]["timestamp"] = timestamp
+      if not isinstance(api[-1]["server"], list):
+        api[-1]["server"] = [api[-1]["server"]]
 
     # json dump
     output = json.dumps(api)

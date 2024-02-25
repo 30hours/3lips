@@ -58,7 +58,7 @@ class Message:
         with conn:
 
             while True:
-                data = conn.recv(1024)
+                data = conn.recv(65000)
                 if not data:
                     break
                 decoded_data = data.decode()
@@ -82,7 +82,7 @@ class Message:
             try:
                 client_socket.connect((self.host, self.port))
                 client_socket.sendall(message.encode())
-                reply = client_socket.recv(1024).decode()
+                reply = client_socket.recv(65000).decode()
                 return reply
             except ConnectionRefusedError:
                 print(f"Connection to {self.host}:{self.port} refused.")
