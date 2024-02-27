@@ -1,7 +1,7 @@
 function event_radar() {
 
-  radar_url = window.location.origin + '/api' + window.location.search;
-  console.log(radar_url);
+  var radar_url = window.location.origin + 
+    '/api' + window.location.search;
 
   fetch(radar_url)
   .then(response => {
@@ -11,8 +11,15 @@ function event_radar() {
     return response.json();
   })
   .then(data => {
-    // Update aircraft points based on new data
-    console.log("test");
+    for (const key in data["detections_localised"]) {
+      if (data["detections_localised"].hasOwnProperty(key)) {
+        const target = data["detections_localised"][key];
+        const points = target["points"];
+        
+        console.log(points);
+        
+      }
+    }
   })
   .catch(error => {
     // Handle errors during fetch

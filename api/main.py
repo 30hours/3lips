@@ -60,10 +60,11 @@ def serve_static(file):
 @app.route("/api")
 def api():
     api = request.query_string.decode('utf-8')
-    reply = message_api_request.send_message(api)
+    try:
+      reply = message_api_request.send_message(api)
+    except Exception as e:
+      reply = "Exception: " + str(e)
     print(reply, flush=True)
-    urls = request.args.getlist("url")
-    data = [{"url": 'http://' + url} for url in urls]
     return reply
 
 @app.route("/map/<path:file>")

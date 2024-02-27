@@ -181,7 +181,10 @@ async def callback_message_received(msg):
         api[-1]["server"] = [api[-1]["server"]]
 
     # json dump
-    output = json.dumps(api)
+    for item in api:
+      if item["hash"] == short_hash(msg):
+        output = json.dumps(item)
+        break
 
     return output
 

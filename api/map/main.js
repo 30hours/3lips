@@ -184,7 +184,7 @@ window.addEventListener('load', function () {
 
   // add radar points
   const radar_names = new URLSearchParams(
-    window.location.search).getAll('url');
+    window.location.search).getAll('server');
   console.log(radar_names);
   var radar_config_url = radar_names.map(
     url => `http://${url}/api/config`);
