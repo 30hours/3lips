@@ -62,10 +62,11 @@ def api():
     api = request.query_string.decode('utf-8')
     try:
       reply = message_api_request.send_message(api)
+      print(reply, flush=True)
+      return reply
     except Exception as e:
       reply = "Exception: " + str(e)
-    print(reply, flush=True)
-    return reply
+      return jsonify(error=reply), 500
 
 @app.route("/map/<path:file>")
 def serve_map(file):

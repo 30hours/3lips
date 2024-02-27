@@ -15,8 +15,10 @@ function event_radar() {
       if (data["detections_localised"].hasOwnProperty(key)) {
         const target = data["detections_localised"][key];
         const points = target["points"];
-        
-        console.log(points);
+
+        for (const point in points) {
+          console.log(points[point]);
+        }
         
       }
     }
