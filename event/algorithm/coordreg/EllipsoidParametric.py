@@ -6,6 +6,7 @@
 from data.Ellipsoid import Ellipsoid
 from algorithm.geometry.Geometry import Geometry
 import numpy as np
+import math
 
 class EllipsoidParametric:
 
@@ -93,7 +94,7 @@ class EllipsoidParametric:
         """
 
         # rotation matrix
-        phi = ellipsoid.pitch
+        phi = math.pi/2 - ellipsoid.pitch
         theta = ellipsoid.yaw
         R = np.array([
           [np.cos(phi)*np.cos(theta), -np.sin(phi)*np.cos(theta), np.sin(theta)],
@@ -113,5 +114,18 @@ class EllipsoidParametric:
         r = np.stack([x, y, z], axis=-1).reshape(-1, 3)
 
         r_1 = np.dot(r, R) + ellipsoid.midpoint
+
+        lat, lon, alt = Geometry.ecef2lla(ellipsoid.midpoint[0], 
+          ellipsoid.midpoint[1], ellipsoid.midpoint[2])
+        print(lat, flush=True)
+        print(lon, flush=True)
+        print(alt, flush=True)
+
+        lat, lon, alt = Geometry.ecef2lla(ellipsoid.f1[0], 
+          ellipsoid.f1[1], ellipsoid.f1[2])
+        print(ellipsoid.f1, flush=True)
+        print(lat, flush=True)
+        print(lon, flush=True)
+        print(alt, flush=True)
 
         return r_1.tolist()

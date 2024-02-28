@@ -29,6 +29,7 @@ services:
       - 3lips
     volumes:
       - ./common:/app/common
+      - ./test:/app/test
     container_name: 3lips-event
 
   cesium-apache:
