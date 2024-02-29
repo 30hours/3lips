@@ -15,7 +15,7 @@ class Geometry:
     def __init__(self, f1, f2, name):
 
         """
-        @brief Constructor for the Ellipsoid class.
+        @brief Constructor for the Geometry class.
         """
 
     def lla2ecef(latitude, longitude, altitude):
@@ -69,3 +69,69 @@ class Geometry:
         lon = math.degrees(lon)
         
         return lat, lon, alt
+
+    def enu2ecef(e1, n1, u1, lat, lon, alt):
+        """
+        ENU to ECEF
+
+        Parameters
+        ----------
+
+        e1 : float
+            target east ENU coordinate (meters)
+        n1 : float
+            target north ENU coordinate (meters)
+        u1 : float
+            target up ENU coordinate (meters)
+        lat0 : float
+              Observer geodetic latitude
+        lon0 : float
+              Observer geodetic longitude
+        h0 : float
+            observer altitude above geodetic ellipsoid (meters)
+
+
+        Results
+        -------
+        x : float
+            target x ECEF coordinate (meters)
+        y : float
+            target y ECEF coordinate (meters)
+        z : float
+            target z ECEF coordinate (meters)
+        """
+        x0, y0, z0 = Geometry.lla2ecef(lat, lon, alt)
+        dx, dy, dz = Geometry.enu2uvw(e1, n1, u1, lat, lon)
+
+        return x0 + dx, y0 + dy, z0 + dz
+
+    def enu2uvw(east, north, up, lat, lon):
+        """
+        Parameters
+        ----------
+
+        e1 : float
+            target east ENU coordinate (meters)
+        n1 : float
+            target north ENU coordinate (meters)
+        u1 : float
+            target up ENU coordinate (meters)
+
+        Results
+        -------
+
+        u : float
+        v : float
+        w : float
+        """
+
+        lat = math.radians(lat)
+        lon = math.radians(lon)
+
+        t = math.cos(lat) * up - math.sin(lat) * north
+        w = math.sin(lat) * up + math.cos(lat) * north
+
+        u = math.cos(lon) * t - math.sin(lon) * east
+        v = math.sin(lon) * t + math.cos(lon) * east
+
+        return u, v, w

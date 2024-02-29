@@ -94,38 +94,50 @@ class EllipsoidParametric:
         """
 
         # rotation matrix
-        phi = math.pi/2 - ellipsoid.pitch
+        phi = ellipsoid.pitch
         theta = ellipsoid.yaw
+        phi = 0
+        theta = 0
         R = np.array([
           [np.cos(phi)*np.cos(theta), -np.sin(phi)*np.cos(theta), np.sin(theta)],
           [np.sin(phi), np.cos(phi), 0],
           [-np.cos(phi)*np.sin(theta), np.sin(phi)*np.sin(theta), np.cos(theta)]
         ])
 
+        # rotation matrix normal
+        # theta = ellipsoid.pitch_plane
+        # phi = ellipsoid.yaw_plane
+        # R2 = np.array([
+        #   [np.cos(phi)*np.cos(theta), -np.sin(phi)*np.cos(theta), np.sin(theta)],
+        #   [np.sin(phi), np.cos(phi), 0],
+        #   [-np.cos(phi)*np.sin(theta), np.sin(phi)*np.sin(theta), np.cos(theta)]
+        # ])
+
         # compute samples vectorised
-        a = (bistatic_range-ellipsoid.distance)/2
-        b = np.sqrt(a**2 - (ellipsoid.distance/2))
+        a = (bistatic_range+ellipsoid.distance)/2
+        b = np.sqrt(a**2 - (ellipsoid.distance/2)**2)
         u_values = np.linspace(0, 2 * np.pi, n)
-        v_values = np.linspace(-np.pi/2, np.pi/2, n)
+        v_values = np.linspace(-np.pi, np.pi, n)
         u, v = np.meshgrid(u_values, v_values, indexing='ij')
-        x = a * np.cos(u)
-        y = b * np.sin(u) * np.cos(v)
-        z = b * np.sin(u) * np.sin(v)
+        # x = a * np.cos(u)
+        # y = b * np.sin(u) * np.cos(v)
+        # z = b * np.sin(u) * np.sin(v)
+        x = a * np.cos(u) * np.cos(v)
+        y = b * np.sin(u)
+        z = a * np.cos(u) * np.sin(v)
         r = np.stack([x, y, z], axis=-1).reshape(-1, 3)
 
-        r_1 = np.dot(r, R) + ellipsoid.midpoint
+        #r_1 = np.dot(r, np.dot(R, R2)) + ellipsoid.midpoint
+        #r_1 = np.dot(r, R) + ellipsoid.midpoint
+        #r_1 = np.dot(r, R)
+        r_1 = r
 
-        lat, lon, alt = Geometry.ecef2lla(ellipsoid.midpoint[0], 
-          ellipsoid.midpoint[1], ellipsoid.midpoint[2])
-        print(lat, flush=True)
-        print(lon, flush=True)
-        print(alt, flush=True)
+        a, b, c = Geometry.ecef2lla(
+          ellipsoid.midpoint[0], ellipsoid.midpoint[1], ellipsoid.midpoint[2])
 
-        lat, lon, alt = Geometry.ecef2lla(ellipsoid.f1[0], 
-          ellipsoid.f1[1], ellipsoid.f1[2])
-        print(ellipsoid.f1, flush=True)
-        print(lat, flush=True)
-        print(lon, flush=True)
-        print(alt, flush=True)
+        for i in range(len(r_1)):
+          x, y, z = Geometry.enu2ecef(r_1[i][0], r_1[i][1], r_1[i][2], 
+          a, b, c)
+          r_1[i] = [x, y, z]
 
         return r_1.tolist()

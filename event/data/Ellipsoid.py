@@ -37,3 +37,13 @@ class Ellipsoid:
         (f2[0] - f1[0])**2 +
         (f2[1] - f1[1])**2 +
         (f2[2] - f1[2])**2)
+
+        # rotate to normal plane on WGS-84
+        length = math.sqrt(
+          self.midpoint[0]**2 + 
+          self.midpoint[1]**2 + 
+          self.midpoint[2]**2
+        )
+        vector = [x / length for x in self.midpoint]
+        self.pitch_plane = math.asin(-vector[1])
+        self.yaw_plane = math.atan2(-vector[0], -vector[2])

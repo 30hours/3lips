@@ -16,8 +16,19 @@ function event_radar() {
         const target = data["detections_localised"][key];
         const points = target["points"];
 
+        removeEntitiesByType("test");
+
         for (const point in points) {
-          console.log(points[point]);
+          addPoint(
+            points[point][0], 
+            points[point][1], 
+            points[point][2], 
+            "test", 
+            style_point.color, 
+            style_point.pointSize, 
+            style_point.type, 
+            Date.now()
+          );
         }
         
       }
@@ -33,3 +44,9 @@ function event_radar() {
   });
 
 }
+
+var style_point = {};
+style_point.color = 'rgba(128, 0, 0, 1.0)';
+style_point.pointSize = 10;
+style_point.type = "test";
+style_point.timestamp = Date.now();

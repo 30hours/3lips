@@ -123,11 +123,11 @@ async def event():
           [x_rx, y_rx, z_rx],
           'radar4.30hours.dev'
       )
-      pointsEcef = ellipsoidParametric.sample(ellipsoid, 10000, 5)
+      pointsEcef = ellipsoidParametric.sample(ellipsoid, 25000, 15)
       pointsLla = []
       for point in pointsEcef:
         lat, lon, alt = Geometry.ecef2lla(point[0], point[1], point[2])
-        pointsLla.append([lat, lon, alt])
+        pointsLla.append([round(lat, 4), round(lon, 4), round(alt)])
       localised_dets["test"]["points"] = pointsLla
 
       # output data to API
