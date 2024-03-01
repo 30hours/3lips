@@ -4,6 +4,7 @@
 """
 
 import math
+from algorithm.geometry.Geometry import Geometry
 
 class Ellipsoid:
 
@@ -29,21 +30,14 @@ class Ellipsoid:
         # dependent members
         self.midpoint = [(f1[0]+f2[0])/2, 
           (f1[1]+f2[1])/2, (f1[2]+f2[2])/2]
-        vector = (f2[0]-f1[0], f2[1]-f1[1], f2[2]-f1[2])
-        self.yaw = math.atan2(vector[1], vector[0])
-        self.pitch = math.atan2(vector[2], 
-          math.sqrt(vector[0]**2 + vector[1]**2))
+        midpoint_lla = Geometry.ecef2lla(
+          self.midpoint[0], self.midpoint[1], self.midpoint[2])
+        vector_enu = Geometry.ecef2enu(f1[0], f1[1], f1[2], 
+          midpoint_lla[0], midpoint_lla[1], midpoint_lla[2])
+        self.yaw = -math.atan2(vector_enu[1], vector_enu[0])-math.pi/2
+        self.pitch = math.atan2(vector_enu[2], 
+          math.sqrt(vector_enu[0]**2 + vector_enu[1]**2))
         self.distance = math.sqrt(
         (f2[0] - f1[0])**2 +
         (f2[1] - f1[1])**2 +
         (f2[2] - f1[2])**2)
-
-        # rotate to normal plane on WGS-84
-        length = math.sqrt(
-          self.midpoint[0]**2 + 
-          self.midpoint[1]**2 + 
-          self.midpoint[2]**2
-        )
-        vector = [x / length for x in self.midpoint]
-        self.pitch_plane = math.asin(-vector[1])
-        self.yaw_plane = math.atan2(-vector[0], -vector[2])

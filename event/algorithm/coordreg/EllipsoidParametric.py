@@ -94,14 +94,22 @@ class EllipsoidParametric:
         """
 
         # rotation matrix
+        phi = np.pi/2 - ellipsoid.pitch
+        theta = ellipsoid.yaw + np.pi/2
+        phi = np.deg2rad(3.834)
+        theta = -np.deg2rad(-77+90)
+
         phi = ellipsoid.pitch
         theta = ellipsoid.yaw
-        phi = 0
-        theta = 0
+        # R = np.array([
+        #   [np.cos(phi)*np.cos(theta), -np.sin(phi)*np.cos(theta), np.sin(theta)],
+        #   [np.sin(phi), np.cos(phi), 0],
+        #   [-np.cos(phi)*np.sin(theta), np.sin(phi)*np.sin(theta), np.cos(theta)]
+        # ])
         R = np.array([
-          [np.cos(phi)*np.cos(theta), -np.sin(phi)*np.cos(theta), np.sin(theta)],
-          [np.sin(phi), np.cos(phi), 0],
-          [-np.cos(phi)*np.sin(theta), np.sin(phi)*np.sin(theta), np.cos(theta)]
+          [np.cos(theta), -np.sin(theta)*np.cos(phi), np.sin(theta)*np.sin(phi)],
+          [np.sin(theta), np.cos(theta)*np.cos(phi), -np.cos(theta)*np.sin(phi)],
+          [0, np.sin(phi), np.cos(phi)]
         ])
 
         # rotation matrix normal
@@ -129,8 +137,8 @@ class EllipsoidParametric:
 
         #r_1 = np.dot(r, np.dot(R, R2)) + ellipsoid.midpoint
         #r_1 = np.dot(r, R) + ellipsoid.midpoint
-        #r_1 = np.dot(r, R)
-        r_1 = r
+        r_1 = np.dot(r, R)
+        #r_1 = r
 
         a, b, c = Geometry.ecef2lla(
           ellipsoid.midpoint[0], ellipsoid.midpoint[1], ellipsoid.midpoint[2])

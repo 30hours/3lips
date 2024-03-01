@@ -10,15 +10,16 @@ class Geometry:
     """
     @class Geometry
     @brief A class to store geometric functions.
+    @details Assumes WGS-84 ellipsoid for all functions.
     """
 
-    def __init__(self, f1, f2, name):
+    def __init__(self):
 
         """
         @brief Constructor for the Geometry class.
         """
 
-    def lla2ecef(latitude, longitude, altitude):
+    def lla2ecef(lat, lon, alt):
 
         # WGS84 constants
         a = 6378137.0  # semi-major axis in meters
@@ -26,8 +27,8 @@ class Geometry:
         e = 0.081819190842622
 
         # Convert latitude and longitude to radians
-        lat_rad = math.radians(latitude)
-        lon_rad = math.radians(longitude)
+        lat_rad = math.radians(lat)
+        lon_rad = math.radians(lon)
 
         # Calculate the auxiliary values
         cos_lat = math.cos(lat_rad)
@@ -35,9 +36,9 @@ class Geometry:
         N = a / math.sqrt(1 - f * (2 - f) * sin_lat**2)
 
         # Calculate ECEF coordinates
-        ecef_x = (N + altitude) * cos_lat * math.cos(lon_rad)
-        ecef_y = (N + altitude) * cos_lat * math.sin(lon_rad)
-        ecef_z = ((1-(e**2)) * N + altitude) * sin_lat
+        ecef_x = (N + alt) * cos_lat * math.cos(lon_rad)
+        ecef_y = (N + alt) * cos_lat * math.sin(lon_rad)
+        ecef_z = ((1-(e**2)) * N + alt) * sin_lat
 
         return ecef_x, ecef_y, ecef_z
 
@@ -135,3 +136,50 @@ class Geometry:
         v = math.sin(lon) * t + math.cos(lon) * east
 
         return u, v, w
+
+    def ecef2enu(x, y, z, lat, lon, alt):
+
+        """
+        @brief From observer to target, ECEF => ENU.
+        @param x (float): Target x ECEF coordinate (m).
+        @param y (float): Target y ECEF coordinate (m).
+        @param z (float): Target z ECEF coordinate (m).
+        @param lat (float): Observer geodetic latitude (deg).
+        @param lon (float): Observer geodetic longitude (deg).
+        @param alt (float): Observer geodetic altituder (m).
+        @return east (float): Target east ENU coordinate (m).
+        @return north (float): Target north ENU coordinate (m).
+        @return up (float): Target up ENU coordinate (m).
+        """
+
+        x0, y0, z0 = Geometry.lla2ecef(lat, lon, alt)
+        return Geometry.uvw2enu(x - x0, y - y0, z - z0, lat, lon)
+
+    def uvw2enu(u, v, w, lat, lon):
+
+        """
+        @brief 
+        @param u (float): Shifted ECEF coordinate (m).
+        @param v (float): Shifted ECEF coordinate (m).
+        @param w (float): Shifted ECEF coordinate (m).
+        @param lat (float): Observer geodetic latitude (deg).
+        @param lon (float): Observer geodetic longitude (deg).
+        @param e (float): Target east ENU coordinate (m).
+        @param n (float): Target north ENU coordinate (m).
+        @param u (float): Target up ENU coordinate (m).
+        """
+
+        lat = math.radians(lat)
+        lon = math.radians(lon)
+
+        cos_lat = math.cos(lat)
+        sin_lat = math.sin(lat)
+        cos_lon = math.cos(lon)
+        sin_lon = math.sin(lon)
+
+        t = cos_lon * u + sin_lon * v
+        e = -sin_lon * u + cos_lon * v
+        u = cos_lat * t + sin_lat * w
+        n = -sin_lat * t + cos_lat * w
+
+        return e, n, u

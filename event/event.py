@@ -123,7 +123,7 @@ async def event():
           [x_rx, y_rx, z_rx],
           'radar4.30hours.dev'
       )
-      pointsEcef = ellipsoidParametric.sample(ellipsoid, 25000, 15)
+      pointsEcef = ellipsoidParametric.sample(ellipsoid, 6000, 15)
       pointsLla = []
       for point in pointsEcef:
         lat, lon, alt = Geometry.ecef2lla(point[0], point[1], point[2])
