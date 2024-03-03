@@ -1,4 +1,4 @@
-function event_radar() {
+function event_ellipsoid() {
 
   var radar_url = window.location.origin + 
     '/api' + window.location.search;
@@ -11,25 +11,22 @@ function event_radar() {
     return response.json();
   })
   .then(data => {
-    for (const key in data["detections_localised"]) {
-      if (data["detections_localised"].hasOwnProperty(key)) {
-        const target = data["detections_localised"][key];
-        const points = target["points"];
+    for (const key in data["ellipsoids"]) {
+      if (data["ellipsoids"].hasOwnProperty(key)) {
+        const points = data["ellipsoids"][key];
+        console.log(points);
 
-        // console.log(target);
-        // console.log(points);
-
-        removeEntitiesOlderThanAndFade("detection", 60, 0.5);
+        removeEntitiesOlderThanAndFade("ellipsoids", 30, 0.5);
 
         for (const point in points) {
           addPoint(
             points[point][0], 
             points[point][1], 
             points[point][2], 
-            "detection", 
-            style_point.color, 
-            style_point.pointSize, 
-            style_point.type, 
+            "ellipsoids", 
+            style_ellipsoid.color, 
+            style_ellipsoid.pointSize, 
+            style_ellipsoid.type, 
             Date.now()
           );
         }
@@ -48,8 +45,8 @@ function event_radar() {
 
 }
 
-var style_point = {};
-style_point.color = 'rgba(0, 255, 0, 1.0)';
-style_point.pointSize = 16;
-style_point.type = "detection";
-style_point.timestamp = Date.now();
+var style_ellipsoid = {};
+style_ellipsoid.color = 'rgba(0, 0, 255, 1.0)';
+style_ellipsoid.pointSize = 16;
+style_ellipsoid.type = "ellipsoids";
+style_ellipsoid.timestamp = Date.now();

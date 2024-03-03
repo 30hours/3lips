@@ -254,6 +254,7 @@ window.addEventListener('load', function () {
   // call event loops
   event_adsb();
   event_radar();
+  event_ellipsoid();
 
 })
 
