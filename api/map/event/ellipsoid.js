@@ -11,11 +11,20 @@ function event_ellipsoid() {
     return response.json();
   })
   .then(data => {
+    if (Object.keys(data["ellipsoids"]).length !== 0) {
+      console.log('remove');
+      removeEntitiesByType("ellipsoids");
+    }
+    else {
+      removeEntitiesOlderThanAndFade("ellipsoids", 30, 0.2);
+      console.log('fade');
+    }
     for (const key in data["ellipsoids"]) {
       if (data["ellipsoids"].hasOwnProperty(key)) {
         const points = data["ellipsoids"][key];
 
-        removeEntitiesOlderThanAndFade("ellipsoids", 30, 0.2);
+        console.log(key);
+        console.log(points);
 
         for (const point in points) {
           addPoint(
@@ -39,13 +48,13 @@ function event_ellipsoid() {
   })
   .finally(() => {
     // Schedule the next fetch after a delay (e.g., 5 seconds)
-    setTimeout(event_radar, 1000);
+    setTimeout(event_ellipsoid, 1000);
   });
 
 }
 
 var style_ellipsoid = {};
-style_ellipsoid.color = 'rgba(0, 0, 255, 0.2)';
+style_ellipsoid.color = 'rgba(0, 0, 255, 0.5)';
 style_ellipsoid.pointSize = 16;
 style_ellipsoid.type = "ellipsoids";
 style_ellipsoid.timestamp = Date.now();
