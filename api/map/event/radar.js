@@ -16,9 +16,6 @@ function event_radar() {
         const target = data["detections_localised"][key];
         const points = target["points"];
 
-        // console.log(target);
-        // console.log(points);
-
         removeEntitiesOlderThanAndFade("detection", 60, 0.5);
 
         for (const point in points) {

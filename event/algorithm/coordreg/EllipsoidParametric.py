@@ -81,7 +81,7 @@ class EllipsoidParametric:
             # find close points
             radar_keys = list(target_samples[target].keys())
             samples_intersect = {key: [] for key in radar_keys}
-            threshold = 200
+            threshold = 1500
             for i in range(0, len(target_samples[target])-1):
 
                 for j in range(i+1, len(target_samples[target])):

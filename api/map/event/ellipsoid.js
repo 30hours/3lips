@@ -14,9 +14,8 @@ function event_ellipsoid() {
     for (const key in data["ellipsoids"]) {
       if (data["ellipsoids"].hasOwnProperty(key)) {
         const points = data["ellipsoids"][key];
-        console.log(points);
 
-        removeEntitiesOlderThanAndFade("ellipsoids", 30, 0.5);
+        removeEntitiesOlderThanAndFade("ellipsoids", 30, 0.2);
 
         for (const point in points) {
           addPoint(
@@ -46,7 +45,7 @@ function event_ellipsoid() {
 }
 
 var style_ellipsoid = {};
-style_ellipsoid.color = 'rgba(0, 0, 255, 1.0)';
+style_ellipsoid.color = 'rgba(0, 0, 255, 0.2)';
 style_ellipsoid.pointSize = 16;
 style_ellipsoid.type = "ellipsoids";
 style_ellipsoid.timestamp = Date.now();

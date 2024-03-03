@@ -47,43 +47,54 @@ class Message:
             thread.start()
 
     def handle_client(self, conn, addr):
-
         """
-        @brief Handle communication with a connected client.
-        @param conn (socket.socket): The socket object for the connected client.
-        @param addr (tuple): The address (host, port) of the connected client.
-        @return None.
+        Handle communication with a connected client.
+        :param conn (socket.socket): The socket object for the connected client.
+        :param addr (tuple): The address (host, port) of the connected client.
+        :return None.
         """
-
         with conn:
-
             while True:
-                data = conn.recv(30000)
+                data = conn.recv(8096)
                 if not data:
                     break
-                decoded_data = data.decode()
+
+                # Process data in chunks
+                decoded_data = ""
+                while data:
+                    chunk = data.decode()
+                    decoded_data += chunk
+                    data = conn.recv(8096)
 
                 # Call the callback function if set
                 if self.callback_message_received:
                     reply = asyncio.run(self.callback_message_received(decoded_data))
                     if reply:
-                      conn.sendall(reply.encode())
+                        # Send the reply in chunks
+                        for i in range(0, len(reply), 8096):
+                            conn.sendall(reply[i:i + 8096].encode())
 
     def send_message(self, message):
-
         """
-        @brief Send a message to the specified host and port.
-        @param message (str): The message to be sent.
-        @return None.
+        Send a message to the specified host and port.
+        :param message (str): The message to be sent.
+        :return generator: A generator yielding chunks of the reply.
         """
-
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             client_socket.settimeout(3)
             try:
                 client_socket.connect((self.host, self.port))
-                client_socket.sendall(message.encode())
-                reply = client_socket.recv(30000).decode()
-                return reply
+                # Send the message in chunks
+                for i in range(0, len(message), 8096):
+                    client_socket.sendall(message[i:i + 8096].encode())
+                # Indicate the end of transmission
+                client_socket.shutdown(socket.SHUT_WR)
+                # Receive the reply in chunks
+                while True:
+                    data = client_socket.recv(8096)
+                    if not data:
+                        break
+                    yield data.decode()
             except ConnectionRefusedError:
                 print(f"Connection to {self.host}:{self.port} refused.")
 

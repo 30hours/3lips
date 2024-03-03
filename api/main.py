@@ -62,7 +62,8 @@ def serve_static(file):
 def api():
     api = request.query_string.decode('utf-8')
     try:
-      reply = message_api_request.send_message(api)
+      reply_chunks = message_api_request.send_message(api)
+      reply = ''.join(reply_chunks)
       print(reply, flush=True)
       return reply
     except Exception as e:

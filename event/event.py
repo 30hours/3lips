@@ -133,9 +133,9 @@ async def event():
             bsr = 12470
           if radar == 'radar5.30hours.dev':
             bsr = 1870
-          if radar == 'radar4.30hours.dev':
+          if radar == 'radar6.30hours.dev':
             bsr = 5210
-          points = ellipsoidParametric.sample(ellipsoid, bsr, 10)
+          points = ellipsoidParametric.sample(ellipsoid, bsr, 50)
           for i in range(len(points)):
             lat, lon, alt = Geometry.ecef2lla(points[i][0], points[i][1], points[i][2])
             points[i] = ([round(lat, 3), round(lon, 3), round(alt)])
