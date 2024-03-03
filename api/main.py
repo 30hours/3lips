@@ -17,7 +17,8 @@ app = Flask(__name__)
 # store state data
 servers = [
     {"name": "radar4", "url": "radar4.30hours.dev"},
-    {"name": "radar5", "url": "radar5.30hours.dev"}
+    {"name": "radar5", "url": "radar5.30hours.dev"},
+    {"name": "radar6", "url": "radar6.30hours.dev"}
 ]
 associators = [
   {"name": "ADSB Associator", "id": "adsb-associator"}

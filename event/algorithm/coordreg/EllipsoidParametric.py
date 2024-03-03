@@ -44,6 +44,8 @@ class EllipsoidParametric:
         for target in assoc_detections:
 
             print(target, flush=True)
+            target_samples = {}
+            target_samples[target] = {}
 
             for radar in assoc_detections[target]:
 
@@ -73,20 +75,48 @@ class EllipsoidParametric:
                     radar["radar"]
                   )
 
-                print(ellipsoid.yaw, flush=True)
-                print(ellipsoid.pitch, flush=True)
+                samples = self.sample(ellipsoid, radar["delay"], 20)
+                target_samples[target][radar["radar"]] = samples
 
-                self.sample(ellipsoid, radar["delay"], 10000)
+            # find close points
+            radar_keys = list(target_samples[target].keys())
+            samples_intersect = {key: [] for key in radar_keys}
+            threshold = 200
+            for i in range(0, len(target_samples[target])-1):
 
-            print("", flush=True)
+                for j in range(i+1, len(target_samples[target])):
+
+                    for point1 in target_samples[target][radar_keys[i]]:
+
+                        for point2 in target_samples[target][radar_keys[j]]:
+
+                            if Geometry.distance_ecef(point1, point2) < threshold:
+                                samples_intersect[radar_keys[i]].append(point1)
+                                samples_intersect[radar_keys[j]].append(point2)
+
+            # remove duplicates and convert to LLA
+            output[target] = {}
+            output[target]["points"] = []
+            for key in radar_keys:
+              samples_intersect[key] = [list(t) for t in {tuple(point) for point in samples_intersect[key]}]
+              for i in range(len(samples_intersect[key])):
+                samples_intersect[key][i] = Geometry.ecef2lla(
+                  samples_intersect[key][i][0], 
+                  samples_intersect[key][i][1], 
+                  samples_intersect[key][i][2])
+                output[target]["points"].append([
+                  round(samples_intersect[key][i][0], 3),
+                  round(samples_intersect[key][i][1], 3),
+                  round(samples_intersect[key][i][2])])
 
         return output
 
     def sample(self, ellipsoid, bistatic_range, n):
 
         """
-        @brief Generate a set of points for the ellipsoid.
+        @brief Generate a set of ECEF points for the ellipsoid.
         @details No arc length parametrisation.
+        @details Use ECEF because distance measure is simple over LLA.
         @param ellipsoid (Ellipsoid): The ellipsoid object to use.
         @param bistatic_range (float): Bistatic range for ellipsoid.
         @param n (int): Number of points to generate.
@@ -101,51 +131,39 @@ class EllipsoidParametric:
 
         phi = ellipsoid.pitch
         theta = ellipsoid.yaw
-        # R = np.array([
-        #   [np.cos(phi)*np.cos(theta), -np.sin(phi)*np.cos(theta), np.sin(theta)],
-        #   [np.sin(phi), np.cos(phi), 0],
-        #   [-np.cos(phi)*np.sin(theta), np.sin(phi)*np.sin(theta), np.cos(theta)]
-        # ])
         R = np.array([
           [np.cos(theta), -np.sin(theta)*np.cos(phi), np.sin(theta)*np.sin(phi)],
           [np.sin(theta), np.cos(theta)*np.cos(phi), -np.cos(theta)*np.sin(phi)],
           [0, np.sin(phi), np.cos(phi)]
         ])
 
-        # rotation matrix normal
-        # theta = ellipsoid.pitch_plane
-        # phi = ellipsoid.yaw_plane
-        # R2 = np.array([
-        #   [np.cos(phi)*np.cos(theta), -np.sin(phi)*np.cos(theta), np.sin(theta)],
-        #   [np.sin(phi), np.cos(phi), 0],
-        #   [-np.cos(phi)*np.sin(theta), np.sin(phi)*np.sin(theta), np.cos(theta)]
-        # ])
-
         # compute samples vectorised
         a = (bistatic_range+ellipsoid.distance)/2
         b = np.sqrt(a**2 - (ellipsoid.distance/2)**2)
         u_values = np.linspace(0, 2 * np.pi, n)
-        v_values = np.linspace(-np.pi, np.pi, n)
+        v_values = np.linspace(-np.pi/2, np.pi/2, int(n/2))
         u, v = np.meshgrid(u_values, v_values, indexing='ij')
-        # x = a * np.cos(u)
-        # y = b * np.sin(u) * np.cos(v)
-        # z = b * np.sin(u) * np.sin(v)
-        x = a * np.cos(u) * np.cos(v)
-        y = b * np.sin(u)
-        z = a * np.cos(u) * np.sin(v)
+        x = a * np.cos(u)
+        y = b * np.sin(u) * np.cos(v)
+        z = b * np.sin(u) * np.sin(v)
         r = np.stack([x, y, z], axis=-1).reshape(-1, 3)
 
-        #r_1 = np.dot(r, np.dot(R, R2)) + ellipsoid.midpoint
-        #r_1 = np.dot(r, R) + ellipsoid.midpoint
         r_1 = np.dot(r, R)
-        #r_1 = r
-
-        a, b, c = Geometry.ecef2lla(
-          ellipsoid.midpoint[0], ellipsoid.midpoint[1], ellipsoid.midpoint[2])
+        output = []
 
         for i in range(len(r_1)):
-          x, y, z = Geometry.enu2ecef(r_1[i][0], r_1[i][1], r_1[i][2], 
-          a, b, c)
-          r_1[i] = [x, y, z]
+          # points to ECEF
+          x, y, z = Geometry.enu2ecef(
+            r_1[i][0], r_1[i][1], r_1[i][2], 
+            ellipsoid.midpoint_lla[0], 
+            ellipsoid.midpoint_lla[1], 
+            ellipsoid.midpoint_lla[2])
+          # points to LLA
+          [x, y, z] = Geometry.ecef2lla(x, y, z)
+          # only store points above ground
+          if z > 0:
+            # convert back to ECEF for simple distance measurements
+            [x, y, z] = Geometry.lla2ecef(x, y, z)
+            output.append([round(x, 3), round(y, 3), round(z)])
 
-        return r_1.tolist()
+        return output

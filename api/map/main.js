@@ -281,16 +281,17 @@ function removeEntitiesOlderThanAndFade(entityType, maxAgeSeconds, baseAlpha) {
     const type = entity.properties["type"].getValue();
     const timestamp = entity.properties["timestamp"].getValue();
     if (entity.properties && entity.properties["type"] && 
-      entity.properties["type"].getValue() === entityType &&
-      Date.now()-timestamp > maxAgeSeconds*1000) {
+      entity.properties["type"].getValue() === entityType) {
+      
+      if (Date.now()-timestamp > maxAgeSeconds*1000) {
         viewer.entities.remove(entity);
-    }
-    else {
-      entity.point.color = new Cesium.Color.fromAlpha(
-        entity.point.color.getValue(), baseAlpha*(1-(Date.now()-timestamp)/(maxAgeSeconds*1000)));
+      }
+      else {
+        entity.point.color = new Cesium.Color.fromAlpha(
+          entity.point.color.getValue(), baseAlpha*(1-(Date.now()-timestamp)/(maxAgeSeconds*1000)));
+      }
     }
   }
-
 }
 
 function removeEntitiesByType(entityType) {

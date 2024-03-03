@@ -85,7 +85,7 @@ async def event():
           key: radar_dict[key] 
           for key in item["server"] 
           if key in radar_dict
-}
+      }
 
       # associator selection
       if item["associator"] == "adsb-associator":
@@ -105,30 +105,36 @@ async def event():
       associated_dets = associator.process(item["server"], radar_dict_item)
       localised_dets = coordreg.process(associated_dets, radar_dict_item)
 
+      if associated_dets:
+        print(associated_dets, flush=True)
+
+      #if localised_dets:
+        print(localised_dets, flush=True)
+
       # tmp test
-      localised_dets = {}
-      localised_dets["test"] = {}
-      x_tx, y_tx, z_tx = Geometry.lla2ecef(
-          radar_dict_item['radar4.30hours.dev']["config"]['location']['tx']['latitude'],
-          radar_dict_item['radar4.30hours.dev']["config"]['location']['tx']['longitude'],
-          radar_dict_item['radar4.30hours.dev']["config"]['location']['tx']['altitude']
-      )
-      x_rx, y_rx, z_rx = Geometry.lla2ecef(
-          radar_dict_item['radar4.30hours.dev']["config"]['location']['rx']['latitude'],
-          radar_dict_item['radar4.30hours.dev']["config"]['location']['rx']['longitude'],
-          radar_dict_item['radar4.30hours.dev']["config"]['location']['rx']['altitude']
-      )
-      ellipsoid = Ellipsoid(
-          [x_tx, y_tx, z_tx],
-          [x_rx, y_rx, z_rx],
-          'radar4.30hours.dev'
-      )
-      pointsEcef = ellipsoidParametric.sample(ellipsoid, 6000, 15)
-      pointsLla = []
-      for point in pointsEcef:
-        lat, lon, alt = Geometry.ecef2lla(point[0], point[1], point[2])
-        pointsLla.append([round(lat, 4), round(lon, 4), round(alt)])
-      localised_dets["test"]["points"] = pointsLla
+      # localised_dets = {}
+      # localised_dets["test"] = {}
+      # x_tx, y_tx, z_tx = Geometry.lla2ecef(
+      #     radar_dict_item['radar4.30hours.dev']["config"]['location']['tx']['latitude'],
+      #     radar_dict_item['radar4.30hours.dev']["config"]['location']['tx']['longitude'],
+      #     radar_dict_item['radar4.30hours.dev']["config"]['location']['tx']['altitude']
+      # )
+      # x_rx, y_rx, z_rx = Geometry.lla2ecef(
+      #     radar_dict_item['radar4.30hours.dev']["config"]['location']['rx']['latitude'],
+      #     radar_dict_item['radar4.30hours.dev']["config"]['location']['rx']['longitude'],
+      #     radar_dict_item['radar4.30hours.dev']["config"]['location']['rx']['altitude']
+      # )
+      # ellipsoid = Ellipsoid(
+      #     [x_tx, y_tx, z_tx],
+      #     [x_rx, y_rx, z_rx],
+      #     'radar4.30hours.dev'
+      # )
+      # points = ellipsoidParametric.sample(ellipsoid, 2000, 25)
+      # pointsLla = []
+      # for point in points:
+      #   lat, lon, alt = Geometry.ecef2lla(point[0], point[1], point[2])
+      #   pointsLla.append([round(lat, 3), round(lon, 3), round(alt)])
+      # localised_dets["test"]["points"] = pointsLla
 
       # output data to API
       item["detections_associated"] = associated_dets

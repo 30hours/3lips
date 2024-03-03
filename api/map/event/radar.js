@@ -16,14 +16,17 @@ function event_radar() {
         const target = data["detections_localised"][key];
         const points = target["points"];
 
-        removeEntitiesByType("test");
+        console.log(target);
+        console.log(points);
+
+        removeEntitiesOlderThanAndFade("detection", 60, 0.5);
 
         for (const point in points) {
           addPoint(
             points[point][0], 
             points[point][1], 
             points[point][2], 
-            "test", 
+            "detection", 
             style_point.color, 
             style_point.pointSize, 
             style_point.type, 
@@ -46,7 +49,7 @@ function event_radar() {
 }
 
 var style_point = {};
-style_point.color = 'rgba(128, 0, 0, 1.0)';
-style_point.pointSize = 10;
-style_point.type = "test";
+style_point.color = 'rgba(0, 255, 0, 1.0)';
+style_point.pointSize = 16;
+style_point.type = "detection";
 style_point.timestamp = Date.now();
