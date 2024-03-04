@@ -11,20 +11,20 @@ function event_ellipsoid() {
     return response.json();
   })
   .then(data => {
+
+    if (!data["ellipsoids"]) {
+      return;
+    }
+
     if (Object.keys(data["ellipsoids"]).length !== 0) {
-      console.log('remove');
       removeEntitiesByType("ellipsoids");
     }
     else {
-      removeEntitiesOlderThanAndFade("ellipsoids", 30, 0.2);
-      console.log('fade');
+      removeEntitiesOlderThanAndFade("ellipsoids", 5, 0.5);
     }
     for (const key in data["ellipsoids"]) {
       if (data["ellipsoids"].hasOwnProperty(key)) {
         const points = data["ellipsoids"][key];
-
-        console.log(key);
-        console.log(points);
 
         for (const point in points) {
           addPoint(

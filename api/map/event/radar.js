@@ -11,12 +11,17 @@ function event_radar() {
     return response.json();
   })
   .then(data => {
+
+    if (!data["detections_localised"]) {
+      return;
+    }
+
+    removeEntitiesOlderThanAndFade("detection", 10, 0.5);
+
     for (const key in data["detections_localised"]) {
       if (data["detections_localised"].hasOwnProperty(key)) {
         const target = data["detections_localised"][key];
         const points = target["points"];
-
-        removeEntitiesOlderThanAndFade("detection", 60, 0.5);
 
         for (const point in points) {
           addPoint(

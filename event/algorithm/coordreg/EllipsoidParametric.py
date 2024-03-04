@@ -75,39 +75,39 @@ class EllipsoidParametric:
                     radar["radar"]
                   )
 
-                samples = self.sample(ellipsoid, radar["delay"]*1000, 20)
+                samples = self.sample(ellipsoid, radar["delay"]*1000, 120)
                 target_samples[target][radar["radar"]] = samples
 
-            # find close points
+            # find close points - ellipsoid 1 = master
             radar_keys = list(target_samples[target].keys())
-            samples_intersect = {key: [] for key in radar_keys}
+            samples_intersect = []
             threshold = 200
-            for i in range(0, len(target_samples[target])-1):
 
-                for j in range(i+1, len(target_samples[target])):
-
-                    for point1 in target_samples[target][radar_keys[i]]:
-
-                        for point2 in target_samples[target][radar_keys[j]]:
-
-                            if Geometry.distance_ecef(point1, point2) < threshold:
-                                samples_intersect[radar_keys[i]].append(point1)
-                                samples_intersect[radar_keys[j]].append(point2)
+            # loop points in master ellipsoid
+            for point1 in target_samples[target][radar_keys[0]]:
+                valid_point = True
+                # loop over each other list
+                for i in range(1, len(radar_keys)):
+                    # loop points in other list
+                    if not any(Geometry.distance_ecef(point1, point2) < threshold 
+                      for point2 in target_samples[target][radar_keys[i]]):
+                        valid_point = False
+                        break
+                if valid_point:
+                    samples_intersect.append(point1)
 
             # remove duplicates and convert to LLA
             output[target] = {}
             output[target]["points"] = []
-            for key in radar_keys:
-              samples_intersect[key] = [list(t) for t in {tuple(point) for point in samples_intersect[key]}]
-              for i in range(len(samples_intersect[key])):
-                samples_intersect[key][i] = Geometry.ecef2lla(
-                  samples_intersect[key][i][0], 
-                  samples_intersect[key][i][1], 
-                  samples_intersect[key][i][2])
-                output[target]["points"].append([
-                  round(samples_intersect[key][i][0], 3),
-                  round(samples_intersect[key][i][1], 3),
-                  round(samples_intersect[key][i][2])])
+            for i in range(len(samples_intersect)):
+              samples_intersect[i] = Geometry.ecef2lla(
+                samples_intersect[i][0], 
+                samples_intersect[i][1], 
+                samples_intersect[i][2])
+              output[target]["points"].append([
+                round(samples_intersect[i][0], 3),
+                round(samples_intersect[i][1], 3),
+                round(samples_intersect[i][2])])
 
         return output
 
