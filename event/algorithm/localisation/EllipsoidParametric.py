@@ -80,7 +80,7 @@ class EllipsoidParametric:
                 samples = self.sample(ellipsoid, radar["delay"]*1000, self.nSamples)
                 target_samples[target][radar["radar"]] = samples
 
-            # find close points - ellipsoid 1 = master
+            # find close points, ellipsoid 1 is master
             radar_keys = list(target_samples[target].keys())
             samples_intersect = []
 

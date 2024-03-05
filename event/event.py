@@ -14,6 +14,7 @@ import json
 import hashlib
 
 from algorithm.associator.AdsbAssociator import AdsbAssociator
+from algorithm.localisation.EllipseParametric import EllipseParametric
 from algorithm.localisation.EllipsoidParametric import EllipsoidParametric
 from common.Message import Message
 
@@ -26,6 +27,7 @@ api = []
 # init config
 tDelete = 60
 adsbAssociator = AdsbAssociator()
+ellipseParametric = EllipseParametric()
 ellipsoidParametric = EllipsoidParametric()
 
 async def event():
@@ -97,6 +99,8 @@ async def event():
       # localisation selection
       if item["localisation"] == "ellipsoid-parametric":
         localisation = ellipsoidParametric
+      elif item["localisation"] == "ellipse-parametric":
+        localisation = ellipseParametric
       else:
         print("Error: Localisation invalid.")
         return

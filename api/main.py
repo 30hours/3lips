@@ -23,17 +23,11 @@ servers = [
 associators = [
   {"name": "ADSB Associator", "id": "adsb-associator"}
 ]
-# coordregs = [
-#   {"name": "Ellipse Analytic Intersection", "id": "ellipse-conic-int"},
-#   {"name": "Ellipse Parametric", "id": "ellipse-parametric"},
-#   {"name": "Ellipse Parametric (Arc Length)", "id": "ellipse-parametric-arc"},
-#   {"name": "Ellipsoid Parametric", "id": "ellipsoid-parametric"},
-#   {"name": "Ellipsoid Parametric (Arc Length)", "id": "ellipsoid-parametric-arc"}
-# ]
+# todo: ellipse conic int (analytic), SX, arc length
 localisations = [
+  {"name": "Ellipse Parametric", "id": "ellipse-parametric"},
   {"name": "Ellipsoid Parametric", "id": "ellipsoid-parametric"}
 ]
-
 adsbs = [
   {"name": "adsb.30hours.dev", "url": "adsb.30hours.dev"},
   {"name": "None", "url": ""}
