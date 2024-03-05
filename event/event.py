@@ -116,6 +116,11 @@ async def event():
         for key, value in associated_dets.items()
         if isinstance(value, list) and len(value) >= 3
       }
+      associated_dets_2_radars = {
+        key: value
+        for key, value in associated_dets.items()
+        if isinstance(value, list) and len(value) >= 2
+      }
       localised_dets = localisation.process(associated_dets_3_radars, radar_dict_item)
 
       if associated_dets:
@@ -123,11 +128,11 @@ async def event():
 
       # show ellipsoids of associated detections for 1 target
       ellipsoids = {}
-      if associated_dets:
+      if associated_dets_2_radars:
         # get first target key
-        key = next(iter(associated_dets))
+        key = next(iter(associated_dets_2_radars))
         ellipsoid_radars = []
-        for radar in associated_dets[key]:
+        for radar in associated_dets_2_radars[key]:
           ellipsoid_radars.append(radar["radar"])
           x_tx, y_tx, z_tx = Geometry.lla2ecef(
             radar_dict_item[radar["radar"]]["config"]['location']['tx']['latitude'],

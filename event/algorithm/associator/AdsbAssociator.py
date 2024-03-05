@@ -70,7 +70,7 @@ class AdsbAssociator:
                     output[key] = [value]
                 else:
                     output[key].append(value)
-        output = {key: values for key, values in output.items() if len(values) > 1}
+        #output = {key: values for key, values in output.items() if len(values) > 1}
 
         return output
 
