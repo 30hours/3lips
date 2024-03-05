@@ -16,6 +16,7 @@ import hashlib
 from algorithm.associator.AdsbAssociator import AdsbAssociator
 from algorithm.localisation.EllipseParametric import EllipseParametric
 from algorithm.localisation.EllipsoidParametric import EllipsoidParametric
+from algorithm.localisation.SphericalIntersection import SphericalIntersection
 from common.Message import Message
 
 from data.Ellipsoid import Ellipsoid
@@ -29,6 +30,7 @@ tDelete = 60
 adsbAssociator = AdsbAssociator()
 ellipseParametric = EllipseParametric()
 ellipsoidParametric = EllipsoidParametric()
+sphericalIntersection = SphericalIntersection()
 
 async def event():
 
@@ -97,10 +99,12 @@ async def event():
         return
 
       # localisation selection
-      if item["localisation"] == "ellipsoid-parametric":
-        localisation = ellipsoidParametric
-      elif item["localisation"] == "ellipse-parametric":
+      if item["localisation"] == "ellipse-parametric":
         localisation = ellipseParametric
+      elif item["localisation"] == "ellipsoid-parametric":
+        localisation = ellipsoidParametric
+      elif item["localisation"] == "spherical-intersection":
+        localisation = sphericalIntersection
       else:
         print("Error: Localisation invalid.")
         return
