@@ -41,12 +41,12 @@ document.getElementById('buttonMap').addEventListener('click', function() {
   // Get the form values
   var servers = document.querySelectorAll('.toggle-button.active');
   var associator = document.querySelector('[name="associator"]').value;
-  var coordreg = document.querySelector('[name="coordreg"]').value;
+  var localisation = document.querySelector('[name="localisation"]').value;
   var adsb = document.querySelector('[name="adsb"]').value;
 
   // Construct the URL with the form values
   var apiUrl = '?server=' + Array.from(servers).map(server => server.value).join('&server=');
-  var mapUrl = '/map/index.html' + apiUrl + '&associator=' + associator + '&coordreg=' + coordreg + '&adsb=' + adsb;
+  var mapUrl = '/map/index.html' + apiUrl + '&associator=' + associator + '&localisation=' + localisation + '&adsb=' + adsb;
 
   // Redirect to the constructed URL
   window.location.href = mapUrl;

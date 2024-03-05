@@ -47,7 +47,7 @@
 <div class="col-md-6">
   <div class="jumbotron">
     <h1 class="display-4 text-center">3lips</h1>
-    <p class="lead">Coordinate registration for multi-static radar using ellipse intersections. Requires input of <a href="https://github.com/30hours/blah2" target="_blank">blah2</a> servers, and choice of algorithm for association and coordinate registration. This program exposes an API endpoint to generate geographic coordinates and a <a href="https://github.com/CesiumGS/cesium" target="_blank">Cesium</a> map for display.</p>
+    <p class="lead">Target localisation for multi-static radar using ellipse intersections. Requires input of <a href="https://github.com/30hours/blah2" target="_blank">blah2</a> servers, and choice of algorithm for association and target localisation. This program exposes an API endpoint to generate geographic coordinates and a <a href="https://github.com/CesiumGS/cesium" target="_blank">Cesium</a> map for display.</p>
     <p class="lead">See <a href="https://github.com/30hours/3lips" target="_blank">github.com/30hours/3lips</a> for more details.</p>
   </div>
   <div class="calculator-form">
@@ -72,10 +72,10 @@
       </div>
 
       <div class="mb-3">
-        <label class="form-label fw-bold">Coordinate Registration:</label>
-        <select class="form-select" name="coordreg">
-          {% for coordreg in coordregs %}
-            <option value="{{ coordreg.id }}">{{ coordreg.name }}</option>
+        <label class="form-label fw-bold">Target Localisation:</label>
+        <select class="form-select" name="localisation">
+          {% for localisation in localisations %}
+            <option value="{{ localisation.id }}">{{ localisation.name }}</option>
           {% endfor %}
         </select>
       </div>

@@ -1,12 +1,12 @@
 # 3lips
 
-Coordinate registration for multi-static radar using ellipse intersections. Not a dating app.
+Target localisation for multi-static radar using ellipse intersections. Not a dating app.
 
 ## Features
 
 - Provides a JSON API for geolocation of targets given [blah2](http://github.com/30hours/blah2) radar nodes.
 - Uses a [CesiumJS](http://github.com/CesiumGS/cesium) web front-end to visualise data.
-- Ability to compare a number of algorithms for coordinate registration.
+- Ability to compare a number of algorithms for target localisation.
 
 ## Usage
 
@@ -27,9 +27,13 @@ The association uses the following algorithm:
 
 - ADS-B associator will associate the highest SNR target within some delay and Doppler boundary around the truth.
 
-The coordinate registration uses 1 of the following algorithms:
+The target localisation uses 1 of the following algorithms:
 
-- 
+- **Ellipse parametric** samples an ellipse (2D) at 0 altitude. Find intersections between 3 or more ellipses such that the distance to each point is under some threshold.
+
+- **Ellipsoid parametric** samples an ellipsoid (3D). Find intersections between 3 or more ellipsoids such that the distance to each point is under some threshold.
+
+- **Spherical intersection** a closed form solution which applies when a common receiver or transmitter are used. As described in [Two Methods for Target Localization in Multistatic Passive Radar](https://ieeexplore.ieee.org/document/6129656).
 
 The system architecture is as follows:
 
@@ -40,7 +44,6 @@ The system architecture is as follows:
 ## Future Work
 
 - Implement an association algorithm that is not reliant on ADS-B truth.
-- Add a variety of methods for solving the ellipse/ellipsoid intersection.
 - Choose to use detection or track data from each radar.
 - Long term plots to show metrics such as 2D location accuracy to ADS-B, number of aircraft tracked, etc.
 

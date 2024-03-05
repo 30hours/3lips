@@ -14,7 +14,7 @@ import json
 import hashlib
 
 from algorithm.associator.AdsbAssociator import AdsbAssociator
-from algorithm.coordreg.EllipsoidParametric import EllipsoidParametric
+from algorithm.localisation.EllipsoidParametric import EllipsoidParametric
 from common.Message import Message
 
 from data.Ellipsoid import Ellipsoid
@@ -94,11 +94,11 @@ async def event():
         print("Error: Associator invalid.")
         return
 
-      # coord reg selection
-      if item["coordreg"] == "ellipsoid-parametric":
-        coordreg = ellipsoidParametric
+      # localisation selection
+      if item["localisation"] == "ellipsoid-parametric":
+        localisation = ellipsoidParametric
       else:
-        print("Error: Coord reg invalid.")
+        print("Error: Localisation invalid.")
         return
 
       # processing
@@ -108,7 +108,7 @@ async def event():
         for key, value in associated_dets.items()
         if isinstance(value, list) and len(value) >= 3
       }
-      localised_dets = coordreg.process(associated_dets_3_radars, radar_dict_item)
+      localised_dets = localisation.process(associated_dets_3_radars, radar_dict_item)
 
       if associated_dets:
         print(associated_dets, flush=True)

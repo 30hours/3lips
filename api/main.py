@@ -30,7 +30,7 @@ associators = [
 #   {"name": "Ellipsoid Parametric", "id": "ellipsoid-parametric"},
 #   {"name": "Ellipsoid Parametric (Arc Length)", "id": "ellipsoid-parametric-arc"}
 # ]
-coordregs = [
+localisations = [
   {"name": "Ellipsoid Parametric", "id": "ellipsoid-parametric"}
 ]
 
@@ -49,7 +49,7 @@ message_api_request = Message('event', 6969)
 @app.route("/")
 def index():
     return render_template("index.html", servers=servers, \
-      associators=associators, coordregs=coordregs, adsbs=adsbs)
+      associators=associators, localisations=localisations, adsbs=adsbs)
 
 # serve static files from the /app/public folder
 @app.route('/public/<path:file>')

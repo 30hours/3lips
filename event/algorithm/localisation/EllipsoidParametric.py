@@ -24,15 +24,17 @@ class EllipsoidParametric:
         """
 
         self.ellipsoids = []
+        self.nSamples = 150
+        self.threshold  = 800
 
     def process(self, assoc_detections, radar_data):
 
         """
-        @brief Perform coord registration using the ellipsoid parametric method.
+        @brief Perform target localisation using the ellipsoid parametric method.
         @details Generate a (non arc-length) parametric ellipsoid for each node.
         @param assoc_detections (dict): JSON of blah2 radar detections.
         @param radar_data (dict): JSON of adsb2dd truth detections.
-        @return str: JSON of associated detections.
+        @return dict: Dict of associated detections.
         """
 
         output = {}
@@ -75,13 +77,12 @@ class EllipsoidParametric:
                     radar["radar"]
                   )
 
-                samples = self.sample(ellipsoid, radar["delay"]*1000, 120)
+                samples = self.sample(ellipsoid, radar["delay"]*1000, self.nSamples)
                 target_samples[target][radar["radar"]] = samples
 
             # find close points - ellipsoid 1 = master
             radar_keys = list(target_samples[target].keys())
             samples_intersect = []
-            threshold = 500
 
             # loop points in master ellipsoid
             for point1 in target_samples[target][radar_keys[0]]:
@@ -89,7 +90,7 @@ class EllipsoidParametric:
                 # loop over each other list
                 for i in range(1, len(radar_keys)):
                     # loop points in other list
-                    if not any(Geometry.distance_ecef(point1, point2) < threshold 
+                    if not any(Geometry.distance_ecef(point1, point2) < self.threshold 
                       for point2 in target_samples[target][radar_keys[i]]):
                         valid_point = False
                         break
@@ -124,11 +125,6 @@ class EllipsoidParametric:
         """
 
         # rotation matrix
-        phi = np.pi/2 - ellipsoid.pitch
-        theta = ellipsoid.yaw + np.pi/2
-        phi = np.deg2rad(3.834)
-        theta = -np.deg2rad(-77+90)
-
         phi = ellipsoid.pitch
         theta = ellipsoid.yaw
         R = np.array([

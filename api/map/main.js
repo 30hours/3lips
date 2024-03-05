@@ -130,8 +130,16 @@ var viewer = new Cesium.Viewer("cesiumContainer", {
 	terrainProviderViewModels: terrainProviders,
 	geocoder: false,
 	shouldAnimate: true,
+  animation: false,
+  timeline: false,
 	selectionIndicator: false
 });
+
+// keep data attribution, remove CesiumIon logo
+var cesiumCredit = document.querySelector('.cesium-credit-logoContainer');
+if (cesiumCredit) {
+    cesiumCredit.style.display = 'none';
+}
 
 /**
  * @brief Adds a point to Cesium viewer with specified parameters.
