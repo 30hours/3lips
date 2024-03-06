@@ -149,10 +149,10 @@ async def event():
             [x_rx, y_rx, z_rx],
             radar["radar"]
           )
-          points = ellipsoidParametric.sample(ellipsoid, radar["delay"]*1000, 50)
+          points = localisation.sample(ellipsoid, radar["delay"]*1000, 50)
           for i in range(len(points)):
             lat, lon, alt = Geometry.ecef2lla(points[i][0], points[i][1], points[i][2])
-            points[i] = ([round(lat, 3), round(lon, 3), round(alt)])
+            points[i] = ([round(lat, 3), round(lon, 3), 0])
           ellipsoids[radar["radar"]] = points
 
       # output data to API

@@ -145,16 +145,10 @@ class EllipseParametric:
         for i in range(len(r_1)):
           # points to ECEF
           x, y, z = Geometry.enu2ecef(
-            r_1[i][0], r_1[i][1], 0, 
+            r_1[i][0], r_1[i][1], 100, 
             ellipsoid.midpoint_lla[0], 
             ellipsoid.midpoint_lla[1], 
             ellipsoid.midpoint_lla[2])
-          # points to LLA
-          [x, y, z] = Geometry.ecef2lla(x, y, z)
-          # only store points above ground
-          if z > 0:
-            # convert back to ECEF for simple distance measurements
-            [x, y, z] = Geometry.lla2ecef(x, y, z)
-            output.append([round(x, 3), round(y, 3), 0])
+          output.append([x, y, z])
 
         return output
