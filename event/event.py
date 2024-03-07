@@ -17,6 +17,7 @@ from algorithm.associator.AdsbAssociator import AdsbAssociator
 from algorithm.localisation.EllipseParametric import EllipseParametric
 from algorithm.localisation.EllipsoidParametric import EllipsoidParametric
 from algorithm.localisation.SphericalIntersection import SphericalIntersection
+from algorithm.truth.AdsbTruth import AdsbTruth
 from common.Message import Message
 
 from data.Ellipsoid import Ellipsoid
@@ -31,6 +32,7 @@ adsbAssociator = AdsbAssociator()
 ellipseParametric = EllipseParametric()
 ellipsoidParametric = EllipsoidParametric()
 sphericalIntersection = SphericalIntersection()
+adsbTruth = AdsbTruth(5)
 
 async def event():
 
@@ -80,6 +82,16 @@ async def event():
             "detection": radar_detections[i],
             "config": radar_config[i]
         }
+
+    # store truth in dict
+    truth_adsb = {}
+    adsb_urls = []
+    for item in api_event:
+        adsb_urls.append(item["adsb"])
+    adsb_urls = list(set(adsb_urls))
+    for url in adsb_urls:
+      truth_adsb[url] = adsbTruth.process(url)
+    print(truth_adsb, flush=True)
 
     # main processing
     for item in api_event:
@@ -157,6 +169,7 @@ async def event():
 
       # output data to API
       item["timestamp_event"] = timestamp
+      item["truth"] = truth_adsb[item["adsb"]]
       item["detections_associated"] = associated_dets
       item["detections_localised"] = localised_dets
       item["ellipsoids"] = ellipsoids
