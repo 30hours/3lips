@@ -33,10 +33,12 @@ ellipseParametric = EllipseParametric()
 ellipsoidParametric = EllipsoidParametric()
 sphericalIntersection = SphericalIntersection()
 adsbTruth = AdsbTruth(5)
+save = True
+saveFile = '/app/save/' + str(int(time.time())) + '.ndjson'
 
 async def event():
 
-    global api
+    global api, save
     timestamp = int(time.time()*1000)
     api_event = copy.copy(api)
 
@@ -91,7 +93,6 @@ async def event():
     adsb_urls = list(set(adsb_urls))
     for url in adsb_urls:
       truth_adsb[url] = adsbTruth.process(url)
-    print(truth_adsb, flush=True)
 
     # main processing
     for item in api_event:
@@ -122,7 +123,7 @@ async def event():
         return
 
       # processing
-      associated_dets = associator.process(item["server"], radar_dict_item)
+      associated_dets = associator.process(item["server"], radar_dict_item, timestamp)
       associated_dets_3_radars = {
         key: value
         for key, value in associated_dets.items()
@@ -181,6 +182,10 @@ async def event():
     # update API
     api = api_event
 
+    # save to file
+    if save:
+      append_api_to_file(api)
+
 
 # event loop
 async def main():
@@ -188,6 +193,11 @@ async def main():
     while True:
         await event()
         await asyncio.sleep(1)
+
+def append_api_to_file(api_object, filename=saveFile):
+    with open(filename, 'a') as json_file:
+        json.dump(api_object, json_file)
+        json_file.write('\n')
 
 def short_hash(input_string, length=10):
 

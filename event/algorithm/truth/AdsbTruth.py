@@ -4,7 +4,6 @@
 """
 
 import requests
-import math
 
 class AdsbTruth:
 

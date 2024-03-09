@@ -25,12 +25,13 @@ class AdsbAssociator:
         @brief Constructor for the AdsbAssociator class.
         """
 
-    def process(self, radar_list, radar_data):
+    def process(self, radar_list, radar_data, timestamp):
 
         """
         @brief Associate detections from 2+ radars.
         @param radar_list (list): List of radars to associate.
         @param radar_data (dict): Radar data for list of radars.
+        @param timestamp (int): Timestamp to compute delays at (ms).
         @return dict: Associated detections by [hex][radar].
         """
 
@@ -60,7 +61,8 @@ class AdsbAssociator:
 
                 # associate radar and truth
                 assoc_detections_radar.append(self.process_1_radar(
-                  radar, radar_data[radar]["detection"], adsb_detections))
+                  radar, radar_data[radar]["detection"], 
+                  adsb_detections, timestamp))
 
         # associate detections between radars
         output = {}
@@ -74,7 +76,7 @@ class AdsbAssociator:
 
         return output
 
-    def process_1_radar(self, radar, radar_detections, adsb_detections):
+    def process_1_radar(self, radar, radar_detections, adsb_detections, timestamp):
 
         """
         @brief Associate detections between 1 radar/truth pair.
@@ -94,6 +96,11 @@ class AdsbAssociator:
 
                 if 'delay' in adsb_detections[aircraft] and len(radar_detections['delay']) >= 1:
 
+                    # extrapolate delay/Doppler to current time
+                    # delta_t = (timestamp - adsb_detections[aircraft]['timestamp'])/1000
+                    # delay = 1000*adsb_detections[aircraft]['delay'] + \
+                      
+
                     # distance from aircraft to all detections
                     closest_point, distance = self.closest_point(
                       adsb_detections[aircraft]['delay'], 
@@ -107,7 +114,8 @@ class AdsbAssociator:
                         assoc_detections[aircraft] = {
                           'radar': radar,
                           'delay': closest_point[0],
-                          'doppler': closest_point[1]
+                          'doppler': closest_point[1],
+                          'timestamp': adsb_detections[aircraft]['timestamp']
                         }
 
         return assoc_detections
