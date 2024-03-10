@@ -104,7 +104,7 @@ class EllipseParametric:
               samples_intersect[i] = Geometry.ecef2lla(
                 samples_intersect[i][0], 
                 samples_intersect[i][1], 
-                0)
+                samples_intersect[i][2])
               output[target]["points"].append([
                 round(samples_intersect[i][0], 3),
                 round(samples_intersect[i][1], 3),

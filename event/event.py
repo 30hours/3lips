@@ -12,6 +12,7 @@ import time
 import copy
 import json
 import hashlib
+import os
 
 from algorithm.associator.AdsbAssociator import AdsbAssociator
 from algorithm.localisation.EllipseParametric import EllipseParametric
@@ -19,7 +20,6 @@ from algorithm.localisation.EllipsoidParametric import EllipsoidParametric
 from algorithm.localisation.SphericalIntersection import SphericalIntersection
 from algorithm.truth.AdsbTruth import AdsbTruth
 from common.Message import Message
-
 from data.Ellipsoid import Ellipsoid
 from algorithm.geometry.Geometry import Geometry
 
@@ -195,6 +195,11 @@ async def main():
         await asyncio.sleep(1)
 
 def append_api_to_file(api_object, filename=saveFile):
+
+    if not os.path.exists(filename):
+        with open(filename, 'w') as new_file:
+            pass
+
     with open(filename, 'a') as json_file:
         json.dump(api_object, json_file)
         json_file.write('\n')

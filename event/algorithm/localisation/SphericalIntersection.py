@@ -34,4 +34,14 @@ class SphericalIntersection:
 
         output = {}
 
+        # return if no detections
+        if not assoc_detections:
+          return output
+
+        for target in assoc_detections:
+
+            print(assoc_detections)
+            #nDetections = assoc_detections
+            #S = np.zeros()
+
         return output

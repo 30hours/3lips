@@ -26,7 +26,8 @@ associators = [
 # todo: ellipse conic int (analytic), SX, arc length
 localisations = [
   {"name": "Ellipse Parametric", "id": "ellipse-parametric"},
-  {"name": "Ellipsoid Parametric", "id": "ellipsoid-parametric"}
+  {"name": "Ellipsoid Parametric", "id": "ellipsoid-parametric"},
+  {"name": "Spherical Intersection", "id": "spherical-intersection"}
 ]
 adsbs = [
   {"name": "adsb.30hours.dev", "url": "adsb.30hours.dev"},
