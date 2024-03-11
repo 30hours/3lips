@@ -42,10 +42,13 @@ class SphericalIntersection:
 
         # pick first radar rx node as ENU reference (arbitrary)
         radar = next(iter(radar_data))
+        print(radar_data)
+        print(radar)
+        print(radar_data[radar]["config"])
         reference_lla = [
-          radar_data[radar]["config"][self.type]["latitude"], 
-          radar_data[radar]["config"][self.type]["longitude"],
-          radar_data[radar]["config"][self.type]["altitude"]]
+          radar_data[radar]["config"]["location"][self.type]["latitude"], 
+          radar_data[radar]["config"]["location"][self.type]["longitude"],
+          radar_data[radar]["config"]["location"][self.type]["altitude"]]
 
         for target in assoc_detections:
 

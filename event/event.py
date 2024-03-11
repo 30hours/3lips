@@ -38,6 +38,8 @@ saveFile = '/app/save/' + str(int(time.time())) + '.ndjson'
 
 async def event():
 
+    start_time = time.time()
+
     global api, save
     timestamp = int(time.time()*1000)
     api_event = copy.copy(api)
@@ -170,12 +172,15 @@ async def event():
                 points[i] = ([round(lat, 3), round(lon, 3), 0])
               ellipsoids[radar["radar"]] = points
 
+      stop_time = time.time()
+
       # output data to API
       item["timestamp_event"] = timestamp
       item["truth"] = truth_adsb[item["adsb"]]
       item["detections_associated"] = associated_dets
       item["detections_localised"] = localised_dets
       item["ellipsoids"] = ellipsoids
+      item["time"] = stop_time - start_time
 
     # delete old API requests
     api_event = [

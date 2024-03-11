@@ -62,7 +62,7 @@ class AdsbAssociator:
                 # associate radar and truth
                 assoc_detections_radar.append(self.process_1_radar(
                   radar, radar_data[radar]["detection"], 
-                  adsb_detections, timestamp))
+                  adsb_detections, timestamp, radar_data[radar]["config"]["capture"]["fc"]))
 
         # associate detections between radars
         output = {}
@@ -76,7 +76,7 @@ class AdsbAssociator:
 
         return output
 
-    def process_1_radar(self, radar, radar_detections, adsb_detections, timestamp):
+    def process_1_radar(self, radar, radar_detections, adsb_detections, timestamp, fc):
 
         """
         @brief Associate detections between 1 radar/truth pair.
@@ -96,10 +96,13 @@ class AdsbAssociator:
 
                 if 'delay' in adsb_detections[aircraft] and len(radar_detections['delay']) >= 1:
 
-                    # extrapolate delay/Doppler to current time
-                    # delta_t = (timestamp - adsb_detections[aircraft]['timestamp'])/1000
-                    # delay = 1000*adsb_detections[aircraft]['delay'] + \
-                      
+                    # extrapolate delay to current time
+                    # TODO extrapolate Doppler too
+                    for i in range(len(radar_detections['delay'])):
+                        delta_t = (timestamp - radar_detections['timestamp'])/1000
+                        delay = (1000*radar_detections['delay'][i] + \
+                        (radar_detections['doppler'][i]*(299792458/fc))*delta_t)/1000
+                        radar_detections['delay'][i] = delay
 
                     # distance from aircraft to all detections
                     closest_point, distance = self.closest_point(
