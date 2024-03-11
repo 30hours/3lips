@@ -63,6 +63,7 @@ def main():
     server = json_data[0][0]["server"]
     timestamp = []
     position = {}
+    detected = {}
     truth_timestamp = []
     truth_position = []
     for item in json_data:
@@ -162,7 +163,8 @@ def main():
     plt.subplot(3, 1, 1)
     plt.legend()
     plt.tight_layout()
-    plt.savefig('save/plot_accuracy.png', bbox_inches='tight', pad_inches=0.01)
+    filename = 'plot_accuracy_' + args.target_name + '.png'
+    plt.savefig('save/' + filename, bbox_inches='tight', pad_inches=0.01)
 
 if __name__ == "__main__":
     main()

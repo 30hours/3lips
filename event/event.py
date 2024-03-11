@@ -141,32 +141,34 @@ async def event():
 
       # show ellipsoids of associated detections for 1 target
       ellipsoids = {}
-      if associated_dets_2_radars:
-        # get first target key
-        key = next(iter(associated_dets_2_radars))
-        ellipsoid_radars = []
-        for radar in associated_dets_2_radars[key]:
-          ellipsoid_radars.append(radar["radar"])
-          x_tx, y_tx, z_tx = Geometry.lla2ecef(
-            radar_dict_item[radar["radar"]]["config"]['location']['tx']['latitude'],
-            radar_dict_item[radar["radar"]]["config"]['location']['tx']['longitude'],
-            radar_dict_item[radar["radar"]]["config"]['location']['tx']['altitude']
-          )
-          x_rx, y_rx, z_rx = Geometry.lla2ecef(
-            radar_dict_item[radar["radar"]]["config"]['location']['rx']['latitude'],
-            radar_dict_item[radar["radar"]]["config"]['location']['rx']['longitude'],
-            radar_dict_item[radar["radar"]]["config"]['location']['rx']['altitude']
-          )
-          ellipsoid = Ellipsoid(
-            [x_tx, y_tx, z_tx],
-            [x_rx, y_rx, z_rx],
-            radar["radar"]
-          )
-          points = localisation.sample(ellipsoid, radar["delay"]*1000, 50)
-          for i in range(len(points)):
-            lat, lon, alt = Geometry.ecef2lla(points[i][0], points[i][1], points[i][2])
-            points[i] = ([round(lat, 3), round(lon, 3), 0])
-          ellipsoids[radar["radar"]] = points
+      if item["localisation"] == "ellipse-parametric" or \
+      item["localisation"] == "ellipsoid-parametric":
+          if associated_dets_2_radars:
+            # get first target key
+            key = next(iter(associated_dets_2_radars))
+            ellipsoid_radars = []
+            for radar in associated_dets_2_radars[key]:
+              ellipsoid_radars.append(radar["radar"])
+              x_tx, y_tx, z_tx = Geometry.lla2ecef(
+                radar_dict_item[radar["radar"]]["config"]['location']['tx']['latitude'],
+                radar_dict_item[radar["radar"]]["config"]['location']['tx']['longitude'],
+                radar_dict_item[radar["radar"]]["config"]['location']['tx']['altitude']
+              )
+              x_rx, y_rx, z_rx = Geometry.lla2ecef(
+                radar_dict_item[radar["radar"]]["config"]['location']['rx']['latitude'],
+                radar_dict_item[radar["radar"]]["config"]['location']['rx']['longitude'],
+                radar_dict_item[radar["radar"]]["config"]['location']['rx']['altitude']
+              )
+              ellipsoid = Ellipsoid(
+                [x_tx, y_tx, z_tx],
+                [x_rx, y_rx, z_rx],
+                radar["radar"]
+              )
+              points = localisation.sample(ellipsoid, radar["delay"]*1000, 50)
+              for i in range(len(points)):
+                lat, lon, alt = Geometry.ecef2lla(points[i][0], points[i][1], points[i][2])
+                points[i] = ([round(lat, 3), round(lon, 3), 0])
+              ellipsoids[radar["radar"]] = points
 
       # output data to API
       item["timestamp_event"] = timestamp
