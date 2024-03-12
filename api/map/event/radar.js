@@ -16,7 +16,7 @@ function event_radar() {
       return;
     }
 
-    removeEntitiesOlderThanAndFade("detection", 10, 0.5);
+    removeEntitiesOlderThanAndFade("detection", 90, 0.5);
 
     for (const key in data["detections_localised"]) {
       if (data["detections_localised"].hasOwnProperty(key)) {

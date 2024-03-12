@@ -101,7 +101,7 @@ class AdsbAssociator:
                     for i in range(len(radar_detections['delay'])):
                         delta_t = (timestamp - radar_detections['timestamp'])/1000
                         delay = (1000*radar_detections['delay'][i] + \
-                        (radar_detections['doppler'][i]*(299792458/fc))*delta_t)/1000
+                        (-radar_detections['doppler'][i]*(299792458/fc))*delta_t)/1000
                         radar_detections['delay'][i] = delay
 
                     # distance from aircraft to all detections

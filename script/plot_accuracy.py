@@ -81,6 +81,10 @@ def main():
 
             # store target data
             method_localisation = method["localisation"]
+
+            if method_localisation == "spherical-intersection":
+              continue
+
             if method_localisation not in position:
               position[method_localisation] = {}
               position[method_localisation]["timestamp"] = []

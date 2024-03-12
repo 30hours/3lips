@@ -46,9 +46,11 @@ class SphericalIntersection:
         print(radar)
         print(radar_data[radar]["config"])
         reference_lla = [
-          radar_data[radar]["config"]["location"][self.type]["latitude"], 
-          radar_data[radar]["config"]["location"][self.type]["longitude"],
-          radar_data[radar]["config"]["location"][self.type]["altitude"]]
+          radar_data[radar]["config"]["location"][self.not_type]["latitude"], 
+          radar_data[radar]["config"]["location"][self.not_type]["longitude"],
+          radar_data[radar]["config"]["location"][self.not_type]["altitude"]]
+        reference_ecef = Geometry.lla2ecef(reference_lla[0],
+          reference_lla[1], reference_lla[2])
 
         for target in assoc_detections:
 
@@ -58,7 +60,7 @@ class SphericalIntersection:
             S = np.zeros((nDetections, 3))
 
             # additional vector
-            z = np.zeros((nDetections, 1))
+            z_vec = np.zeros((nDetections, 1))
 
             # bistatic range vector r
             r = np.zeros((nDetections, 1))
@@ -78,38 +80,68 @@ class SphericalIntersection:
                 S[index, :] = [x_enu, y_enu, z_enu]
 
                 # add to z
-                x2, y2, z2 = Geometry.lla2ecef(
-                  config['location'][self.not_type]['latitude'],
-                  config['location'][self.not_type]['longitude'],
-                  config['location'][self.not_type]['altitude'])
-                distance = Geometry.distance_ecef([x, y, z], [x2, y2, z2])
-                z[index, :] = (x**2 + y**2 + z**2 - distance**2)/2
+                distance = Geometry.distance_ecef(
+                  [x, y, z], [reference_ecef[0], 
+                  reference_ecef[1], reference_ecef[2]])
+                R_i = (radar["delay"]*1000) + distance
+                # print('R_i', flush=True)
+                # print(R_i, flush=True)
+                # print(radar["delay"]*1000, flush=True)
+                z_vec[index, :] = (x_enu**2 + y_enu**2 + z_enu**2 - R_i**2)/2
 
                 # add to r
-                r[index, :] = radar["delay"] + distance
+                r[index, :] = R_i
+
+            # print first to check
+            print('start printing SX:', flush=True)
+            print(S, flush=True)
+            print(S.size, flush=True)
+            print(z_vec, flush=True)
+            print(z_vec.size, flush=True)
+            print(r, flush=True)
+            print(r.size, flush=True)
+
 
             # now compute matrix math
             S_star = np.linalg.inv(S.T @ S) @ S.T
-            a = S_star @ z
+            a = S_star @ z_vec
             b = S_star @ r
             R_t = [0, 0]
-            R_t[0] = (-2*(a.T @ b) - np.sqrt(4*(a.T @ b)**2 - \
-              4*((b.T @ b)-1)*(a.T @ a)))/2*((b.T @ b)-1)
-            R_t[1] = (-2*(a.T @ b) + np.sqrt(4*(a.T @ b)**2 - \
-              4*((b.T @ b)-1)*(a.T @ a)))/2*((b.T @ b)-1)
+            discrimninant = 4*((a.T @ b)**2) - 4*((b.T @ b) - 1)*(a.T @ a)
+            if discriminant >= 0:
+                R_t[0] = (-2*(a.T @ b) - np.sqrt(discriminant))/(2*((b.T @ b)-1))
+                R_t[1] = (-2*(a.T @ b) + np.sqrt(discriminant))/(2*((b.T @ b)-1))
+            else:
+                R_t[0] = np.real((-2*(a.T @ b) - np.sqrt(discriminant + 0j))/(2*((b.T @ b)-1)))
+                R_t[1] = np.real((-2*(a.T @ b) + np.sqrt(discriminant + 0j))/(2*((b.T @ b)-1)))
             x_t = [0, 0]
-            x_t[0] = S_star @ (z + r*R_t[0])
-            x_t[1] = S_star @ (z + r*R_t[1])
+            x_t[0] = S_star @ (z_vec + r*R_t[0])
+            x_t[1] = S_star @ (z_vec + r*R_t[1])
 
             # use solution with highest altitude
             output[target] = {}
             output[target]["points"] = []
+            x_t_list = [np.squeeze(arr).tolist() for arr in x_t]
+            print('x_t in ENU?')
+            print(x_t_list)
+
+            # convert points back to LLA
+            for index in range(len(x_t_list)):
+                x, y, z = Geometry.enu2ecef(x_t_list[index][0], 
+                  x_t_list[index][1], 
+                  x_t_list[index][2],
+                  reference_lla[0],
+                  reference_lla[1],
+                  reference_lla[2])
+                lat, lon, alt = Geometry.ecef2lla(x, y, z)
+                x_t_list[index] = [lat, lon, alt]
+
             if x_t[0][2] > x_t[1][2]:
-                output[target]["points"].append(x_t[0])
+                output[target]["points"].append(x_t_list[0])
             else:
-                output[target]["points"].append(x_t[1])
+                output[target]["points"].append(x_t_list[1])
 
             print('SX points:')
-            print(x_t)
+            print(x_t_list)
                 
         return output
