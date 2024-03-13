@@ -20,15 +20,16 @@ class EllipseParametric:
     @see blah2 at https://github.com/30hours/blah2.
     """
 
-    def __init__(self):
+    def __init__(self, method="mean", nSamples=150, threshold=500):
 
         """
         @brief Constructor for the EllipseParametric class.
         """
 
         self.ellipsoids = []
-        self.nSamples = 150
-        self.threshold  = 800
+        self.nSamples = nSamples
+        self.threshold  = threshold
+        self.method = method
 
     def process(self, assoc_detections, radar_data):
 
@@ -87,53 +88,55 @@ class EllipseParametric:
             radar_keys = list(target_samples[target].keys())
             samples_intersect = []
 
-            # loop points in master ellipsoid
-            # for point1 in target_samples[target][radar_keys[0]]:
-            #     valid_point = True
-            #     # loop over each other list
-            #     for i in range(1, len(radar_keys)):
-            #         # loop points in other list
-            #         if not any(Geometry.distance_ecef(point1, point2) < self.threshold 
-            #         for point2 in target_samples[target][radar_keys[i]]):
-            #             valid_point = False
-            #             break
-            #     if valid_point:
-            #         samples_intersect.append(point1)
+            if self.method == "mean":
 
-            # average_point = self.average_points(samples_intersect)
-            # samples_intersect = [average_point]
+                # loop points in main ellipsoid
+                for point1 in target_samples[target][radar_keys[0]]:
+                    valid_point = True
+                    # loop over each other list
+                    for i in range(1, len(radar_keys)):
+                        # loop points in other list
+                        if not any(Geometry.distance_ecef(point1, point2) < self.threshold 
+                        for point2 in target_samples[target][radar_keys[i]]):
+                            valid_point = False
+                            break
+                    if valid_point:
+                        samples_intersect.append(point1)
 
-            min_distance = self.threshold
-            min_point1 = None
-            for point1 in target_samples[target][radar_keys[0]]:
-                valid_point = True
-                distance_from_point1 = [self.threshold]*(len(radar_keys)-1)
-                # loop over each other list
-                for i in range(1, len(radar_keys)):
-                    if i > 1 and distance_from_point1[i-1] > self.threshold:
-                        valid_point = False
-                        break
-                    # loop points in other list
-                    for point2 in target_samples[target][radar_keys[i]]:
-                        distance = Geometry.distance_ecef(point1, point2)
-                        if distance < distance_from_point1[i-1]:
-                            distance_from_point1[i-1] = distance
-                norm = math.sqrt(sum(x ** 2 for x in distance_from_point1))
-                if valid_point and norm < min_distance:
-                    min_distance = norm
-                    min_point1 = point1
-                    
-            if min_point1 is not None:        
-                samples_intersect.append(min_point1)
+                average_point = Geometry.average_points(samples_intersect)
+                samples_intersect = [average_point]
+
+            elif self.method == "minimum":
+
+                min_distance = self.threshold
+                min_point1 = None
+                # loop points in main ellipsoid
+                for point1 in target_samples[target][radar_keys[0]]:
+                    valid_point = True
+                    distance_from_point1 = [self.threshold]*(len(radar_keys)-1)
+                    # loop over each other list
+                    for i in range(1, len(radar_keys)):
+                        if i > 1 and distance_from_point1[i-1] > self.threshold:
+                            valid_point = False
+                            break
+                        # loop points in other list
+                        for point2 in target_samples[target][radar_keys[i]]:
+                            distance = Geometry.distance_ecef(point1, point2)
+                            if distance < distance_from_point1[i-1]:
+                                distance_from_point1[i-1] = distance
+                    norm = math.sqrt(sum(x ** 2 for x in distance_from_point1))
+                    if valid_point and norm < min_distance:
+                        min_distance = norm
+                        min_point1 = point1
+                        
+                if min_point1 is not None:        
+                    samples_intersect.append(min_point1)
+                else:
+                    return output
+
             else:
+                print('Invalid method.')
                 return output
-
-            # find closest points bruteforce
-            # points = list(target_samples[target].values())
-            # result_points, result_distance = self.closest_points_bruteforce(points)
-            # average_point = self.average_points(result_points)
-            # if result_distance < self.threshold:
-            #     samples_intersect.append(average_point)
 
             # remove duplicates and convert to LLA
             output[target] = {}
@@ -190,37 +193,4 @@ class EllipseParametric:
           output.append([x, y, z])
 
         return output
-
-    def euclidean_distance(self, point1, point2):
-        return np.linalg.norm(np.array(point1) - np.array(point2))
-
-    def closest_points_bruteforce(self, point_sets):
-        closest_distance = float('inf')
-        closest_points = None
-
-        for combination in itertools.product(*point_sets):
-            distance = sum(self.euclidean_distance(combination[i], combination[i+1]) for i in range(len(point_sets)-1))
-            if distance < closest_distance:
-                closest_distance = distance
-                closest_points = combination
-
-        return closest_points, closest_distance
-
-    # def closest_points_bruteforce(point_sets):
-    #     closest_distance = float('inf')
-    #     closest_points = None
-
-    #     def calculate_distance(combination):
-    #         nonlocal closest_distance, closest_points
-    #         distance = sum(euclidean_distance(combination[i], combination[i+1]) for i in range(len(point_sets)-1))
-    #         if distance < closest_distance:
-    #             closest_distance = distance
-    #             closest_points = combination
-
-    #     with ThreadPoolExecutor() as executor:
-    #         executor.map(calculate_distance, itertools.product(*point_sets))
-
-    #     return closest_points, closest_distance
-
-    def average_points(self, points):
-        return [sum(coord) / len(coord) for coord in zip(*points)]
+        

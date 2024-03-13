@@ -107,11 +107,12 @@ class SphericalIntersection:
             a = S_star @ z_vec
             b = S_star @ r
             R_t = [0, 0]
-            discrimninant = 4*((a.T @ b)**2) - 4*((b.T @ b) - 1)*(a.T @ a)
+            discriminant = 4*((a.T @ b)**2) - 4*((b.T @ b) - 1)*(a.T @ a)
             if discriminant >= 0:
                 R_t[0] = (-2*(a.T @ b) - np.sqrt(discriminant))/(2*((b.T @ b)-1))
                 R_t[1] = (-2*(a.T @ b) + np.sqrt(discriminant))/(2*((b.T @ b)-1))
             else:
+                print('@@@ discriminant < 0', flush=True)
                 R_t[0] = np.real((-2*(a.T @ b) - np.sqrt(discriminant + 0j))/(2*((b.T @ b)-1)))
                 R_t[1] = np.real((-2*(a.T @ b) + np.sqrt(discriminant + 0j))/(2*((b.T @ b)-1)))
             x_t = [0, 0]

@@ -29,8 +29,8 @@ api = []
 # init config
 tDelete = 60
 adsbAssociator = AdsbAssociator()
-ellipseParametric = EllipseParametric()
-ellipsoidParametric = EllipsoidParametric()
+ellipseParametric = EllipseParametric("mean", 200, 500)
+ellipsoidParametric = EllipsoidParametric("mean", 100, 500)
 sphericalIntersection = SphericalIntersection()
 adsbTruth = AdsbTruth(5)
 save = True
