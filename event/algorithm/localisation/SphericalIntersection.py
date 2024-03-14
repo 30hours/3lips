@@ -13,7 +13,7 @@ class SphericalIntersection:
     @class SphericalIntersection
     @brief A class for intersecting ellipsoids using SX method.
     @details Uses associated detections from multiple radars.
-    @see blah2 at https://github.com/30hours/blah2.
+    @see https://ieeexplore.ieee.org/document/6129656
     """
 
     def __init__(self):
@@ -42,9 +42,6 @@ class SphericalIntersection:
 
         # pick first radar rx node as ENU reference (arbitrary)
         radar = next(iter(radar_data))
-        print(radar_data)
-        print(radar)
-        print(radar_data[radar]["config"])
         reference_lla = [
           radar_data[radar]["config"]["location"][self.not_type]["latitude"], 
           radar_data[radar]["config"]["location"][self.not_type]["longitude"],
@@ -84,23 +81,10 @@ class SphericalIntersection:
                   [x, y, z], [reference_ecef[0], 
                   reference_ecef[1], reference_ecef[2]])
                 R_i = (radar["delay"]*1000) + distance
-                # print('R_i', flush=True)
-                # print(R_i, flush=True)
-                # print(radar["delay"]*1000, flush=True)
                 z_vec[index, :] = (x_enu**2 + y_enu**2 + z_enu**2 - R_i**2)/2
 
                 # add to r
                 r[index, :] = R_i
-
-            # print first to check
-            print('start printing SX:', flush=True)
-            print(S, flush=True)
-            print(S.size, flush=True)
-            print(z_vec, flush=True)
-            print(z_vec.size, flush=True)
-            print(r, flush=True)
-            print(r.size, flush=True)
-
 
             # now compute matrix math
             S_star = np.linalg.inv(S.T @ S) @ S.T
@@ -112,7 +96,6 @@ class SphericalIntersection:
                 R_t[0] = (-2*(a.T @ b) - np.sqrt(discriminant))/(2*((b.T @ b)-1))
                 R_t[1] = (-2*(a.T @ b) + np.sqrt(discriminant))/(2*((b.T @ b)-1))
             else:
-                print('@@@ discriminant < 0', flush=True)
                 R_t[0] = np.real((-2*(a.T @ b) - np.sqrt(discriminant + 0j))/(2*((b.T @ b)-1)))
                 R_t[1] = np.real((-2*(a.T @ b) + np.sqrt(discriminant + 0j))/(2*((b.T @ b)-1)))
             x_t = [0, 0]
@@ -123,8 +106,6 @@ class SphericalIntersection:
             output[target] = {}
             output[target]["points"] = []
             x_t_list = [np.squeeze(arr).tolist() for arr in x_t]
-            print('x_t in ENU?')
-            print(x_t_list)
 
             # convert points back to LLA
             for index in range(len(x_t_list)):
@@ -141,8 +122,5 @@ class SphericalIntersection:
                 output[target]["points"].append(x_t_list[0])
             else:
                 output[target]["points"].append(x_t_list[1])
-
-            print('SX points:')
-            print(x_t_list)
                 
         return output

@@ -142,6 +142,8 @@ class EllipseParametric:
             output[target] = {}
             output[target]["points"] = []
             for i in range(len(samples_intersect)):
+              print('err??', flush=True)
+              print(samples_intersect, flush=True)
               samples_intersect[i] = Geometry.ecef2lla(
                 samples_intersect[i][0], 
                 samples_intersect[i][1], 

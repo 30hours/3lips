@@ -29,8 +29,10 @@ api = []
 # init config
 tDelete = 60
 adsbAssociator = AdsbAssociator()
-ellipseParametric = EllipseParametric("mean", 200, 500)
-ellipsoidParametric = EllipsoidParametric("mean", 100, 500)
+ellipseParametricMean = EllipseParametric("mean", 150, 500)
+ellipseParametricMin = EllipseParametric("min", 150, 500)
+ellipsoidParametricMean = EllipsoidParametric("mean", 120, 1000)
+ellipsoidParametricMin = EllipsoidParametric("min", 120, 1000)
 sphericalIntersection = SphericalIntersection()
 adsbTruth = AdsbTruth(5)
 save = True
@@ -114,10 +116,14 @@ async def event():
         return
 
       # localisation selection
-      if item["localisation"] == "ellipse-parametric":
-        localisation = ellipseParametric
-      elif item["localisation"] == "ellipsoid-parametric":
-        localisation = ellipsoidParametric
+      if item["localisation"] == "ellipse-parametric-mean":
+        localisation = ellipseParametricMean
+      elif item["localisation"] == "ellipse-parametric-min":
+        localisation = ellipseParametricMin
+      elif item["localisation"] == "ellipsoid-parametric-mean":
+        localisation = ellipsoidParametricMean
+      elif item["localisation"] == "ellipsoid-parametric-min":
+        localisation = ellipsoidParametricMin
       elif item["localisation"] == "spherical-intersection":
         localisation = sphericalIntersection
       else:
@@ -143,8 +149,10 @@ async def event():
 
       # show ellipsoids of associated detections for 1 target
       ellipsoids = {}
-      if item["localisation"] == "ellipse-parametric" or \
-      item["localisation"] == "ellipsoid-parametric":
+      if item["localisation"] == "ellipse-parametric-mean" or \
+      item["localisation"] == "ellipsoid-parametric-mean" or \
+      item["localisation"] == "ellipse-parametric-min" or \
+      item["localisation"] == "ellipsoid-parametric-min":
           if associated_dets_2_radars:
             # get first target key
             key = next(iter(associated_dets_2_radars))
@@ -169,7 +177,13 @@ async def event():
               points = localisation.sample(ellipsoid, radar["delay"]*1000, 50)
               for i in range(len(points)):
                 lat, lon, alt = Geometry.ecef2lla(points[i][0], points[i][1], points[i][2])
-                points[i] = ([round(lat, 3), round(lon, 3), 0])
+                if item["localisation"] == "ellipsoid-parametric-mean" or \
+                item["localisation"] == "ellipsoid-parametric-min":
+                  alt = round(alt)
+                if item["localisation"] == "ellipse-parametric-mean" or \
+                item["localisation"] == "ellipse-parametric-min":
+                  alt = 0
+                points[i] = ([round(lat, 3), round(lon, 3), alt])
               ellipsoids[radar["radar"]] = points
 
       stop_time = time.time()

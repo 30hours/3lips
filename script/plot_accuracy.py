@@ -36,6 +36,22 @@ def interpolate_positions(timestamp_vector, truth_timestamp, truth_position):
 
     return interpolated_positions
 
+def calculate_rmse(actual_values, predicted_values):
+    # Convert lists to NumPy arrays for easy calculations
+    actual_values = np.array(actual_values)
+    predicted_values = np.array(predicted_values)
+
+    # Calculate the squared differences
+    squared_diff = (actual_values - predicted_values) ** 2
+
+    # Calculate the mean squared error
+    mean_squared_error = np.mean(squared_diff)
+
+    # Calculate the root mean squared error
+    rmse = np.sqrt(mean_squared_error)
+
+    return rmse
+
 def main():
   
     # input handling
@@ -82,6 +98,7 @@ def main():
             # store target data
             method_localisation = method["localisation"]
 
+            # override skip a method
             if method_localisation == "spherical-intersection":
               continue
 
@@ -146,13 +163,18 @@ def main():
           radar4_lla[0], radar4_lla[1], radar4_lla[2]))
 
     # plot x, y, z
-    plt.figure(figsize=(5,7))
+    #plt.figure(figsize=(5,7))
+    fig, axes = plt.subplots(3, 1, figsize=(5, 7), sharex=True)
     for i in range(3):
         yaxis_truth = [pos[i] for pos in truth_position_resampled_enu]
         plt.subplot(3, 1, i+1)
         plt.plot(timestamp, yaxis_truth, label="ADS-B Truth")
     for method in position:
+        print(position[method])
+        if "detections_enu" not in position[method]:
+          continue
         for i in range(3):
+            print(position)
             yaxis_target = [pos[i] for pos in position[method]["detections_enu"]]
             plt.subplot(3, 1, i+1)
             plt.plot(position[method]["timestamp"], yaxis_target, 'x', label=method)
@@ -169,6 +191,26 @@ def main():
     plt.tight_layout()
     filename = 'plot_accuracy_' + args.target_name + '.png'
     plt.savefig('save/' + filename, bbox_inches='tight', pad_inches=0.01)
+
+    # save tabular data
+    table = {}
+    for method in position:
+        if "detections_enu" not in position[method]:
+          continue
+        table[method] = {}
+        for i in range(3):
+
+            yaxis_truth = np.array([pos[i] for pos in truth_position_resampled_enu])
+            matching_indices = np.isin(np.array(timestamp), np.array(position[method]["timestamp"]))
+            yaxis_truth_target = yaxis_truth[matching_indices]
+            
+            yaxis_target = [pos[i] for pos in position[method]["detections_enu"]]
+            table[method][str(i)] = calculate_rmse(yaxis_target, yaxis_truth_target)
+            print('test')
+            print(yaxis_target)
+            print(yaxis_truth_target)
+
+    print(table)
 
 if __name__ == "__main__":
     main()

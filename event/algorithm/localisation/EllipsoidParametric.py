@@ -103,6 +103,9 @@ class EllipsoidParametric:
                 average_point = Geometry.average_points(samples_intersect)
                 samples_intersect = [average_point]
 
+                if len(samples_intersect) == 0:
+                    return output 
+
             elif self.method == "minimum":
 
                 min_distance = self.threshold

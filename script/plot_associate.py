@@ -103,7 +103,7 @@ def main():
     img = plt.imshow(data, aspect='auto', interpolation='none')
     y_extent = plt.gca().get_ylim()
     img.set_extent([start_time/1000, stop_time/1000, y_extent[1], y_extent[0]])
-    plt.yticks(np.arange(len(radar_label)), radar_label, rotation='vertical')
+    plt.yticks(np.arange(len(radar_label)), radar_label[::-1], rotation='vertical')
     plt.xlabel('Timestamp')
     plt.ylabel('Radar')
     plt.tight_layout()

@@ -25,8 +25,10 @@ associators = [
 ]
 # todo: ellipse conic int (analytic), SX, arc length
 localisations = [
-  {"name": "Ellipse Parametric", "id": "ellipse-parametric"},
-  {"name": "Ellipsoid Parametric", "id": "ellipsoid-parametric"},
+  {"name": "Ellipse Parametric (Mean)", "id": "ellipse-parametric-mean"},
+  {"name": "Ellipse Parametric (Min)", "id": "ellipse-parametric-min"},
+  {"name": "Ellipsoid Parametric (Mean)", "id": "ellipsoid-parametric-mean"},
+  {"name": "Ellipsoid Parametric (Min)", "id": "ellipsoid-parametric-min"},
   {"name": "Spherical Intersection", "id": "spherical-intersection"}
 ]
 adsbs = [
