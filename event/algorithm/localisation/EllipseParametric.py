@@ -103,6 +103,9 @@ class EllipseParametric:
                     if valid_point:
                         samples_intersect.append(point1)
 
+                if len(samples_intersect) == 0:
+                    continue
+
                 average_point = Geometry.average_points(samples_intersect)
                 samples_intersect = [average_point]
 
@@ -132,7 +135,7 @@ class EllipseParametric:
                 if min_point1 is not None:        
                     samples_intersect.append(min_point1)
                 else:
-                    return output
+                    continue
 
             else:
                 print('Invalid method.')
@@ -142,8 +145,6 @@ class EllipseParametric:
             output[target] = {}
             output[target]["points"] = []
             for i in range(len(samples_intersect)):
-              print('err??', flush=True)
-              print(samples_intersect, flush=True)
               samples_intersect[i] = Geometry.ecef2lla(
                 samples_intersect[i][0], 
                 samples_intersect[i][1], 

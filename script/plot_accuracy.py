@@ -99,8 +99,8 @@ def main():
             method_localisation = method["localisation"]
 
             # override skip a method
-            if method_localisation == "spherical-intersection":
-              continue
+            #if method_localisation == "spherical-intersection":
+              #continue
 
             if method_localisation not in position:
               position[method_localisation] = {}

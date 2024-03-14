@@ -100,11 +100,11 @@ class EllipsoidParametric:
                     if valid_point:
                         samples_intersect.append(point1)
 
+                if len(samples_intersect) == 0:
+                    continue
+
                 average_point = Geometry.average_points(samples_intersect)
                 samples_intersect = [average_point]
-
-                if len(samples_intersect) == 0:
-                    return output 
 
             elif self.method == "minimum":
 
@@ -132,7 +132,7 @@ class EllipsoidParametric:
                 if min_point1 is not None:        
                     samples_intersect.append(min_point1)
                 else:
-                    return output
+                    continue
 
             else:
                 print('Invalid method.')
@@ -141,6 +141,10 @@ class EllipsoidParametric:
             # remove duplicates and convert to LLA
             output[target] = {}
             output[target]["points"] = []
+
+            print('test', flush=True)
+            print(samples_intersect, flush=True)
+
             for i in range(len(samples_intersect)):
               samples_intersect[i] = Geometry.ecef2lla(
                 samples_intersect[i][0], 
