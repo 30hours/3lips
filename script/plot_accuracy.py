@@ -164,20 +164,26 @@ def main():
 
     # plot x, y, z
     #plt.figure(figsize=(5,7))
+    position2 = {}
+    position2["ellipse-parametric-mean"] = position["ellipse-parametric-mean"]
+    position2["ellipsoid-parametric-mean"] = position["ellipsoid-parametric-mean"]
+    position2["spherical-intersection"] = position["spherical-intersection"]
+    mark = ['x', 'o', 's']
+    position_reord = ["ellipse-parametric-mean", "ellipsoid-parametric-mean", "spherical-intersection"]
     fig, axes = plt.subplots(3, 1, figsize=(5, 7), sharex=True)
     for i in range(3):
         yaxis_truth = [pos[i] for pos in truth_position_resampled_enu]
         plt.subplot(3, 1, i+1)
         plt.plot(timestamp, yaxis_truth, label="ADS-B Truth")
-    for method in position:
+    for method in position_reord:
         print(position[method])
         if "detections_enu" not in position[method]:
           continue
         for i in range(3):
-            print(position)
+            #print(position)
             yaxis_target = [pos[i] for pos in position[method]["detections_enu"]]
             plt.subplot(3, 1, i+1)
-            plt.plot(position[method]["timestamp"], yaxis_target, 'x', label=method)
+            plt.plot(position[method]["timestamp"], yaxis_target, marker=mark[i], label=method)
             plt.xlabel('Timestamp')
             if i == 0:
                 plt.ylabel('ENU X (m)')
@@ -187,7 +193,7 @@ def main():
                 plt.ylabel('ENU Z (m)')
     
     plt.subplot(3, 1, 1)
-    plt.legend()
+    plt.legend(prop = {"size": 8})
     plt.tight_layout()
     filename = 'plot_accuracy_' + args.target_name + '.png'
     plt.savefig('save/' + filename, bbox_inches='tight', pad_inches=0.01)
@@ -206,9 +212,9 @@ def main():
             
             yaxis_target = [pos[i] for pos in position[method]["detections_enu"]]
             table[method][str(i)] = calculate_rmse(yaxis_target, yaxis_truth_target)
-            print('test')
-            print(yaxis_target)
-            print(yaxis_truth_target)
+            #print('test')
+            #print(yaxis_target)
+            #print(yaxis_truth_target)
 
     print(table)
 

@@ -2,6 +2,10 @@
 
 Target localisation for multi-static radar using ellipse intersections. Not a dating app.
 
+See a live instance at [http://3lips.30hours.dev](http://3lips.30hours.dev).
+
+![3lips example display](./example.png "3lips")
+
 ## Features
 
 - Provides a JSON API for geolocation of targets given [blah2](http://github.com/30hours/blah2) radar nodes.
@@ -12,6 +16,7 @@ Target localisation for multi-static radar using ellipse intersections. Not a da
 
 - Install docker and docker-compose on the host machine.
 - Clone this repository to some directory.
+- Edit the [./config/config.yml](./config./config.yml) file for scenario.
 - Run the docker compose command.
 
 ```bash
@@ -46,6 +51,7 @@ The system architecture is as follows:
 - Implement an association algorithm that is not reliant on ADS-B truth.
 - Choose to use detection or track data from each radar.
 - Long term plots to show metrics such as 2D location accuracy to ADS-B, number of aircraft tracked, etc.
+- Scale number of samples in ellipse/ellipsoid to size of shape.
 
 ## License
 

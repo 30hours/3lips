@@ -20,7 +20,7 @@ function event_ellipsoid() {
       removeEntitiesByType("ellipsoids");
     }
     else {
-      removeEntitiesOlderThanAndFade("ellipsoids", 5, 0.5);
+      removeEntitiesOlderThanAndFade("ellipsoids", 10, 0.5);
     }
     for (const key in data["ellipsoids"]) {
       if (data["ellipsoids"].hasOwnProperty(key)) {
@@ -54,7 +54,7 @@ function event_ellipsoid() {
 }
 
 var style_ellipsoid = {};
-style_ellipsoid.color = 'rgba(0, 0, 255, 0.5)';
+style_ellipsoid.color = 'rgba(0, 255, 255, 0.5)';
 style_ellipsoid.pointSize = 16;
 style_ellipsoid.type = "ellipsoids";
 style_ellipsoid.timestamp = Date.now();

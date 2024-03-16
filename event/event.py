@@ -31,8 +31,8 @@ tDelete = 60
 adsbAssociator = AdsbAssociator()
 ellipseParametricMean = EllipseParametric("mean", 150, 500)
 ellipseParametricMin = EllipseParametric("min", 150, 500)
-ellipsoidParametricMean = EllipsoidParametric("mean", 120, 1000)
-ellipsoidParametricMin = EllipsoidParametric("min", 120, 1000)
+ellipsoidParametricMean = EllipsoidParametric("mean", 60, 800)
+ellipsoidParametricMin = EllipsoidParametric("min", 60, 800)
 sphericalIntersection = SphericalIntersection()
 adsbTruth = AdsbTruth(5)
 save = True
@@ -40,7 +40,7 @@ saveFile = '/app/save/' + str(int(time.time())) + '.ndjson'
 
 async def event():
 
-    start_time = time.time()
+    print('Start event', flush=True)
 
     global api, save
     timestamp = int(time.time()*1000)
@@ -100,6 +100,8 @@ async def event():
 
     # main processing
     for item in api_event:
+
+      start_time = time.time()
 
       # extract dict for item
       radar_dict_item =  {
@@ -196,6 +198,9 @@ async def event():
       item["ellipsoids"] = ellipsoids
       item["time"] = stop_time - start_time
 
+      print('Method: ' + item["localisation"], flush=True)
+      print(item["time"], flush=True)
+
     # delete old API requests
     api_event = [
       item for item in api_event if timestamp - item["timestamp"] <= tDelete*1000]
@@ -234,7 +239,7 @@ def short_hash(input_string, length=10):
 # message received callback
 async def callback_message_received(msg):
 
-    print(f"Callback: Received message in event.py: {msg}", flush=True)
+    #print(f"Callback: Received message in event.py: {msg}", flush=True)
 
     timestamp = int(time.time()*1000)
 
