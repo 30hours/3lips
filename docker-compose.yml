@@ -16,6 +16,7 @@ services:
     networks:
       - 3lips
     volumes:
+      - ./config:/app/config
       - ./common:/app/common
     container_name: 3lips-api
 
@@ -28,6 +29,7 @@ services:
     networks:
       - 3lips
     volumes:
+      - ./config:/app/config
       - ./common:/app/common
       - ./test:/app/test
       - ./save:/app/save

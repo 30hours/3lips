@@ -9,21 +9,32 @@ import os
 import requests
 import time
 import asyncio
+import yaml
 
 from common.Message import Message
 
 app = Flask(__name__)
 
+# init config file
+try:
+    with open('config/config.yml', 'r') as file:
+        config = yaml.safe_load(file)
+    radar_data = config['radar']
+except FileNotFoundError:
+    print("Error: Configuration file not found.")
+except yaml.YAMLError as e:
+    print("Error reading YAML configuration:", e)
+
 # store state data
-servers = [
-    {"name": "radar4", "url": "radar4.30hours.dev"},
-    {"name": "radar5", "url": "radar5.30hours.dev"},
-    {"name": "radar6", "url": "radar6.30hours.dev"}
-]
+servers = []
+for radar in radar_data:
+  if radar['name'] and radar['url']:
+    servers.append({'name': radar['name'], 'url': radar['url']})
+
 associators = [
   {"name": "ADSB Associator", "id": "adsb-associator"}
 ]
-# todo: ellipse conic int (analytic), SX, arc length
+
 localisations = [
   {"name": "Ellipse Parametric (Mean)", "id": "ellipse-parametric-mean"},
   {"name": "Ellipse Parametric (Min)", "id": "ellipse-parametric-min"},
@@ -31,10 +42,18 @@ localisations = [
   {"name": "Ellipsoid Parametric (Min)", "id": "ellipsoid-parametric-min"},
   {"name": "Spherical Intersection", "id": "spherical-intersection"}
 ]
+
 adsbs = [
   {"name": "adsb.30hours.dev", "url": "adsb.30hours.dev"},
   {"name": "None", "url": ""}
 ]
+
+# store valid ids
+valid = {}
+valid['servers'] = [item['url'] for item in servers]
+valid['associators'] = [item['id'] for item in associators]
+valid['localisations'] = [item['id'] for item in localisations]
+valid['adsbs'] = [item['url'] for item in adsbs]
 
 # message received callback
 async def callback_message_received(msg):
@@ -58,6 +77,20 @@ def serve_static(file):
 @app.route("/api")
 def api():
     api = request.query_string.decode('utf-8')
+    # input protection
+    servers_api = request.args.getlist('server')
+    associators_api = request.args.getlist('associator')
+    localisations_api = request.args.getlist('localisation')
+    adsbs_api = request.args.getlist('adsb')
+    if not all(item in valid['servers'] for item in servers_api):
+      return 'Invalid server'
+    if not all(item in valid['associators'] for item in associators_api):
+      return 'Invalid associator'
+    if not all(item in valid['localisations'] for item in localisations_api):
+      return 'Invalid localisation'
+    if not all(item in valid['adsbs'] for item in adsbs_api):
+      return 'Invalid ADSB']
+    # send to event handler
     try:
       reply_chunks = message_api_request.send_message(api)
       reply = ''.join(reply_chunks)

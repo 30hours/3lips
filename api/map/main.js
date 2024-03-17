@@ -179,6 +179,27 @@ if (cesiumCredit) {
   return pointEntity;
 }
 
+function is_localhost(ip) {
+  
+  if (ip === 'localhost') {
+    return true;
+  }
+
+  ip = ip.replace(/^https?:\/\//, "");
+  
+  const localRanges = ['127.0.0.1', '192.168.0.0/16', '10.0.0.0/8', '172.16.0.0/12'];
+
+  const ipToInt = ip => ip.split('.').reduce((acc, octet) => (acc << 8) + +octet, 0) >>> 0;
+
+  return localRanges.some(range => {
+    const [rangeStart, rangeSize = 32] = range.split('/');
+    const start = ipToInt(rangeStart);
+    const end = (start | (1 << (32 - +rangeSize))) >>> 0;
+    return ipToInt(ip) >= start && ipToInt(ip) <= end;
+  });
+
+}
+
 // global vars
 var adsb_url;
 var adsbEntities = {};
@@ -193,13 +214,14 @@ window.addEventListener('load', function () {
   // add radar points
   const radar_names = new URLSearchParams(
     window.location.search).getAll('server');
-  console.log(radar_names);
   var radar_config_url = radar_names.map(
     url => `http://${url}/api/config`);
-  if (this.window.location.protocol === "https:") {
-    radar_config_url = radar_config_url.map(
+  radar_config_url.forEach(function(url) {
+    if (!is_localhost(url)) {
+      radar_config_url = radar_config_url.map(
       url => url.replace(/^http:/, 'https:'));
-  }
+    }
+  });
   var style_radar = {};
   style_radar.color = 'rgba(0, 0, 0, 1.0)';
   style_radar.pointSize = 10;
@@ -241,19 +263,16 @@ window.addEventListener('load', function () {
         }
       })
       .catch(error => {
-        // Handle errors during fetch
         console.error('Error during fetch:', error);
       });
   });
-
-  // get detection data URL
 
   // get truth URL
   adsb_url = new URLSearchParams(
     window.location.search).get('adsb').split('&');
   adsb_url = adsb_url.map(
     url => `http://${url}/data/aircraft.json`);
-  if (this.window.location.protocol === "https:") {
+  if (!is_localhost(adsb_url[0])) {
     adsb_url = adsb_url.map(
       url => url.replace(/^http:/, 'https:'));
   }

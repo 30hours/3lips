@@ -1,0 +1,26 @@
+radar:
+  - name: radar4
+    url: radar4.30hours.dev
+  - name: radar5
+    url: radar5.30hours.dev
+  - name: radar6
+    url: radar6.30hours.dev
+
+associate:
+  adsb:
+    tar1090: 'adsb.30hours.dev'
+    tDelete: 5
+
+localisation:
+  ellipse:
+    nSamples: 100
+    threshold: 500
+    nDisplay: 50
+  ellipsoid:
+    nSamples: 60
+    threshold: 500
+    nDisplay: 50
+
+3lips:
+  save: true
+  tDelete: 60

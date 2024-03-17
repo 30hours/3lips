@@ -13,6 +13,7 @@ import copy
 import json
 import hashlib
 import os
+import yaml
 
 from algorithm.associator.AdsbAssociator import AdsbAssociator
 from algorithm.localisation.EllipseParametric import EllipseParametric
@@ -23,19 +24,36 @@ from common.Message import Message
 from data.Ellipsoid import Ellipsoid
 from algorithm.geometry.Geometry import Geometry
 
+# init config file
+try:
+    with open('config/config.yml', 'r') as file:
+        config = yaml.safe_load(file)
+    nSamplesEllipse = config['localisation']['ellipse']['nSamples']
+    thresholdEllipse = config['localisation']['ellipse']['threshold']
+    nDisplayEllipse = config['localisation']['ellipse']['nDisplay']
+    nSamplesEllipsoid = config['localisation']['ellipsoid']['nSamples']
+    thresholdEllipsoid = config['localisation']['ellipsoid']['threshold']
+    nDisplayEllipsoid = config['localisation']['ellipsoid']['nDisplay']
+    tDeleteAdsb = config['associate']['adsb']['tDelete']
+    save = config['3lips']['save']
+    tDelete = config['3lips']['tDelete']
+except FileNotFoundError:
+    print("Error: Configuration file not found.")
+except yaml.YAMLError as e:
+    print("Error reading YAML configuration:", e)
+
 # init event loop
 api = []
 
 # init config
-tDelete = 60
+tDelete = tDelete
 adsbAssociator = AdsbAssociator()
-ellipseParametricMean = EllipseParametric("mean", 150, 500)
-ellipseParametricMin = EllipseParametric("min", 150, 500)
-ellipsoidParametricMean = EllipsoidParametric("mean", 60, 800)
-ellipsoidParametricMin = EllipsoidParametric("min", 60, 800)
+ellipseParametricMean = EllipseParametric("mean", nSamplesEllipse, thresholdEllipse)
+ellipseParametricMin = EllipseParametric("min", nSamplesEllipse, thresholdEllipse)
+ellipsoidParametricMean = EllipsoidParametric("mean", nSamplesEllipsoid, thresholdEllipsoid)
+ellipsoidParametricMin = EllipsoidParametric("min", nSamplesEllipsoid, thresholdEllipsoid)
 sphericalIntersection = SphericalIntersection()
-adsbTruth = AdsbTruth(5)
-save = True
+adsbTruth = AdsbTruth(tDeleteAdsb)
 saveFile = '/app/save/' + str(int(time.time())) + '.ndjson'
 
 async def event():
@@ -139,6 +157,9 @@ async def event():
         for key, value in associated_dets.items()
         if isinstance(value, list) and len(value) >= 3
       }
+      if associated_dets_3_radars:
+          print('Detections from 3 or more radars availble.')
+          print(associated_dets_3_radars)
       associated_dets_2_radars = {
         key: value
         for key, value in associated_dets.items()
@@ -176,7 +197,7 @@ async def event():
                 [x_rx, y_rx, z_rx],
                 radar["radar"]
               )
-              points = localisation.sample(ellipsoid, radar["delay"]*1000, 50)
+              points = localisation.sample(ellipsoid, radar["delay"]*1000, nDisplayEllipse)
               for i in range(len(points)):
                 lat, lon, alt = Geometry.ecef2lla(points[i][0], points[i][1], points[i][2])
                 if item["localisation"] == "ellipsoid-parametric-mean" or \
@@ -238,8 +259,6 @@ def short_hash(input_string, length=10):
 
 # message received callback
 async def callback_message_received(msg):
-
-    #print(f"Callback: Received message in event.py: {msg}", flush=True)
 
     timestamp = int(time.time()*1000)
 

@@ -13,4 +13,4 @@ EXPOSE 5000
 ENV FLASK_APP=api.py
 
 # run Gunicorn instead of the default Flask development server
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--timeout", "60", "main:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--timeout", "60", "api:app"]

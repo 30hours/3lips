@@ -49,14 +49,10 @@ class EllipseParametric:
 
         for target in assoc_detections:
 
-            print(target, flush=True)
             target_samples = {}
             target_samples[target] = {}
 
             for radar in assoc_detections[target]:
-
-                print(radar["radar"], flush=True)
-                print(radar["delay"], flush=True)
 
                 # create ellipsoid for radar
                 ellipsoid = next((

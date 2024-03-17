@@ -46,14 +46,10 @@ class EllipsoidParametric:
 
         for target in assoc_detections:
 
-            print(target, flush=True)
             target_samples = {}
             target_samples[target] = {}
 
             for radar in assoc_detections[target]:
-
-                print(radar["radar"], flush=True)
-                print(radar["delay"], flush=True)
 
                 # create ellipsoid for radar
                 ellipsoid = next((
@@ -141,9 +137,6 @@ class EllipsoidParametric:
             # remove duplicates and convert to LLA
             output[target] = {}
             output[target]["points"] = []
-
-            print('test', flush=True)
-            print(samples_intersect, flush=True)
 
             for i in range(len(samples_intersect)):
               samples_intersect[i] = Geometry.ecef2lla(
