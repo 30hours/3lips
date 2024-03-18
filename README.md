@@ -30,7 +30,7 @@ The API front-end is available at [http://localhost:49156](http://localhost:4915
 
 The association uses the following algorithm:
 
-- ADS-B associator will associate the highest SNR target within some delay and Doppler boundary around the truth.
+- ADS-B associator will associate the closest target within some delay and Doppler around the truth.
 
 The target localisation uses 1 of the following algorithms:
 
@@ -43,7 +43,7 @@ The target localisation uses 1 of the following algorithms:
 The system architecture is as follows:
 
 - The API server and HTML pages are served through a [Flask](http://github.com/pallets/flask) in Python.
-- An initial API request with a new set of parameters (algorithms or radar nodes) will add these parameters to a common processing loop. This is so fair comparisons can be made between these parameters on the same input data.
+- An initial API request with a new set of parameters (algorithms or radar nodes) will add these parameters to a common processing loop. This is so fair comparisons can be made on the same input data.
 - A set of API parameters will continue to be processed unless there is no API call in some specified time - see *main.py* to update. This allows the latest geolocation to be provided, rather than adding to the processing loop and waiting for the update from the next time increment.
 
 ## Future Work
