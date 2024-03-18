@@ -46,21 +46,17 @@ class AdsbTruth:
 
         # store relevant data
         if adsb:
-
             # loop over aircraft
             for aircraft in adsb["aircraft"]:
-
-              if aircraft.get("seen_pos") and \
-                  aircraft.get("alt_geom") and \
-                  aircraft.get("flight") and \
-                  aircraft.get("seen_pos") < self.seen_pos_limit:
-
-                      output[aircraft["hex"]] = {}
-                      output[aircraft["hex"]]["lat"] = aircraft["lat"]
-                      output[aircraft["hex"]]["lon"] = aircraft["lon"]
-                      output[aircraft["hex"]]["alt"] = aircraft["alt_geom"]
-                      output[aircraft["hex"]]["flight"] = aircraft["flight"]
-                      output[aircraft["hex"]]["timestamp"] = \
-                        adsb["now"] - aircraft["seen_pos"]
-
+                if aircraft.get("seen_pos") and \
+                    aircraft.get("alt_geom") and \
+                    aircraft.get("flight") and \
+                    aircraft.get("seen_pos") < self.seen_pos_limit:
+                        output[aircraft["hex"]] = {}
+                        output[aircraft["hex"]]["lat"] = aircraft["lat"]
+                        output[aircraft["hex"]]["lon"] = aircraft["lon"]
+                        output[aircraft["hex"]]["alt"] = aircraft["alt_geom"]
+                        output[aircraft["hex"]]["flight"] = aircraft["flight"]
+                        output[aircraft["hex"]]["timestamp"] = \
+                          adsb["now"] - aircraft["seen_pos"]
         return output

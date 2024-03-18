@@ -1,52 +1,52 @@
 function event_radar() {
 
-  var radar_url = window.location.origin + 
+  var radar_url = window.location.origin +
     '/api' + window.location.search;
 
   fetch(radar_url)
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  })
-  .then(data => {
-
-    if (!data["detections_localised"]) {
-      return;
-    }
-
-    removeEntitiesOlderThanAndFade("detection", 10, 0.5);
-
-    for (const key in data["detections_localised"]) {
-      if (data["detections_localised"].hasOwnProperty(key)) {
-        const target = data["detections_localised"][key];
-        const points = target["points"];
-
-        for (const point in points) {
-          addPoint(
-            points[point][0], 
-            points[point][1], 
-            points[point][2], 
-            "detection", 
-            style_point.color, 
-            style_point.pointSize, 
-            style_point.type, 
-            Date.now()
-          );
-        }
-        
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    }
-  })
-  .catch(error => {
-    // Handle errors during fetch
-    console.error('Error during fetch:', error);
-  })
-  .finally(() => {
-    // Schedule the next fetch after a delay (e.g., 5 seconds)
-    setTimeout(event_radar, 1000);
-  });
+      return response.json();
+    })
+    .then(data => {
+
+      if (!data["detections_localised"]) {
+        return;
+      }
+
+      removeEntitiesOlderThanAndFade("detection", 10, 0.5);
+
+      for (const key in data["detections_localised"]) {
+        if (data["detections_localised"].hasOwnProperty(key)) {
+          const target = data["detections_localised"][key];
+          const points = target["points"];
+
+          for (const point in points) {
+            addPoint(
+              points[point][0],
+              points[point][1],
+              points[point][2],
+              "detection",
+              style_point.color,
+              style_point.pointSize,
+              style_point.type,
+              Date.now()
+            );
+          }
+
+        }
+      }
+    })
+    .catch(error => {
+      // Handle errors during fetch
+      console.error('Error during fetch:', error);
+    })
+    .finally(() => {
+      // Schedule the next fetch after a delay (e.g., 5 seconds)
+      setTimeout(event_radar, 1000);
+    });
 
 }
 

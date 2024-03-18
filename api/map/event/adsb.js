@@ -1,30 +1,29 @@
 function event_adsb() {
 
   fetch(adsb_url)
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  })
-  .then(data => {
-    // Update aircraft points based on new data
-    updateAircraftPoints(data);
-  })
-  .catch(error => {
-    // Handle errors during fetch
-    console.error('Error during fetch:', error);
-  })
-  .finally(() => {
-    // Schedule the next fetch after a delay (e.g., 5 seconds)
-    setTimeout(event_adsb, 1000);
-  });
-
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Update aircraft points based on new data
+      updateAircraftPoints(data);
+    })
+    .catch(error => {
+      // Handle errors during fetch
+      console.error('Error during fetch:', error);
+    })
+    .finally(() => {
+      // Schedule the next fetch after a delay (e.g., 5 seconds)
+      setTimeout(event_adsb, 1000);
+    });
 }
 
 // Function to update aircraft points
 function updateAircraftPoints(data) {
-  
+
   removeEntitiesOlderThanAndFade("adsb", 60, 0.5);
 
   // Process aircraft data and add points
