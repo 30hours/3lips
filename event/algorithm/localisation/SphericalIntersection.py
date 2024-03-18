@@ -3,9 +3,10 @@
 @author 30hours
 """
 
-from algorithm.geometry.Geometry import Geometry
-import numpy as np
 import math
+import numpy as np
+
+from algorithm.geometry.Geometry import Geometry
 
 class SphericalIntersection:
 

@@ -3,10 +3,11 @@
 @author 30hours
 """
 
+import math
+import numpy as np
+
 from data.Ellipsoid import Ellipsoid
 from algorithm.geometry.Geometry import Geometry
-import numpy as np
-import math
 
 class EllipsoidParametric:
 

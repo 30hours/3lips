@@ -3,13 +3,12 @@
 @author 30hours
 """
 
-from data.Ellipsoid import Ellipsoid
-from algorithm.geometry.Geometry import Geometry
-import numpy as np
 import math
+import numpy as np
 import itertools
 
-from concurrent.futures import ThreadPoolExecutor
+from data.Ellipsoid import Ellipsoid
+from algorithm.geometry.Geometry import Geometry
 
 class EllipseParametric:
 

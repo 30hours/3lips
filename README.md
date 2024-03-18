@@ -16,7 +16,7 @@ See a live instance at [http://3lips.30hours.dev](http://3lips.30hours.dev).
 
 - Install docker and docker-compose on the host machine.
 - Clone this repository to some directory.
-- Edit the [./config/config.yml](./config./config.yml) file for scenario.
+- Edit the [./config/config.yml](config./config.yml) file for scenario.
 - Run the docker compose command.
 
 ```bash
