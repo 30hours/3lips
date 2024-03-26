@@ -20,6 +20,8 @@ try:
   with open('config/config.yml', 'r') as file:
       config = yaml.safe_load(file)
   radar_data = config['radar']
+  map_data = config['map']
+  config_data = config
 except FileNotFoundError:
   print("Error: Configuration file not found.")
 except yaml.YAMLError as e:
@@ -44,7 +46,7 @@ localisations = [
 ]
 
 adsbs = [
-  {"name": "adsb.30hours.dev", "url": "adsb.30hours.dev"},
+  {"name": map_data['tar1090'], "url": map_data['tar1090']},
   {"name": "None", "url": ""}
 ]
 
@@ -122,6 +124,11 @@ def serve_cesium_content(file):
   except requests.exceptions.RequestException as e:
     print(f"Error fetching content from Apache server: {e}")
   return Response('Error fetching content from Apache server', status=500, content_type='text/plain')
+
+# output config file
+@app.route('/config')
+def config():
+  return config_data
 
 if __name__ == "__main__":
   app.run()

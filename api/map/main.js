@@ -1,18 +1,50 @@
-// default camera to Australia
-var extent = Cesium.Rectangle.fromDegrees(138.44, -35.19, 138.93, -34.51);
+// load config with dirty synchronous call
+url = window.location.origin + '/config';
+var config;
+var xhr = new XMLHttpRequest();
+xhr.open("GET", url, false);
+xhr.send();
+if (xhr.status === 200) {
+    config = JSON.parse(xhr.responseText);
+} else {
+    console.error('Request failed with status:', xhr.status);
+}
+
+// fix tile server URL prefix
+for (var key in config['map']['tile_server']) {
+  if (config['map']['tile_server'].hasOwnProperty(key)) {
+      var value = config['map']['tile_server'][key];
+      var prefix = is_localhost(value) ? 'http://' : 'https://';
+      config['map']['tile_server'][key] = prefix + value;
+  }
+}
+
+// default camera view
+var centerLatitude = config['map']['location']['latitude'];
+var centerLongitude = config['map']['location']['longitude'];
+var metersPerDegreeLongitude = 111320 * Math.cos(centerLatitude * Math.PI / 180);
+var metersPerDegreeLatitude = 111132.954 - 559.822 * Math.cos(
+  2 * centerLongitude * Math.PI / 180) + 1.175 * 
+  Math.cos(4 * centerLongitude * Math.PI / 180);
+var widthDegrees = config['map']['center_width'] / metersPerDegreeLongitude;
+var heightDegrees = config['map']['center_height'] / metersPerDegreeLatitude;
+var west = centerLongitude - widthDegrees / 2;
+var south = centerLatitude - heightDegrees / 2;
+var east = centerLongitude + widthDegrees / 2;
+var north = centerLatitude + heightDegrees / 2;
+var extent = Cesium.Rectangle.fromDegrees(west, south, east, north);
 Cesium.Camera.DEFAULT_VIEW_RECTANGLE = extent;
 Cesium.Camera.DEFAULT_VIEW_FACTOR = 0;
 
 var imageryProviders = [];
 
 imageryProviders.push(new Cesium.ProviderViewModel({
-	name: "ESRI Adelaide",
+	name: "ESRI",
 	iconUrl: './icon/esri.jpg',
-	tooltip: 'ESRI Adelaide Tiles',
-	category: 'Offline',
+	tooltip: 'ESRI Tiles',
 	creationFunction: function() {
 		return new Cesium.UrlTemplateImageryProvider({
-			url: 'https://tile.datr.dev/data/esri-adelaide/{z}/{x}/{y}.jpg',
+			url: config['map']['tile_server']['esri'] + '{z}/{x}/{y}.jpg',
       credit: 'Esri, Maxar, Earthstar Geographics, USDA FSA, USGS, Aerogrid, IGN, IGP, and the GIS User Community',
 			maximumLevel: 20,
 		});
@@ -23,10 +55,9 @@ imageryProviders.push(new Cesium.ProviderViewModel({
 	name: "MapBox Streets v11",
 	iconUrl: './icon/mapBoxStreets.png',
 	tooltip: 'MapBox Streets v11 Tiles',
-	category: 'Offline',
 	creationFunction: function() {
 		return new Cesium.UrlTemplateImageryProvider({
-			url: 'https://tile.datr.dev/data/mapbox-streets-v11/{z}/{x}/{y}.png',
+			url: config['map']['tile_server']['mapbox_streets'] + '{z}/{x}/{y}.png',
       credit: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
 			maximumLevel: 16,
 		});
@@ -37,25 +68,10 @@ imageryProviders.push(new Cesium.ProviderViewModel({
 	name: "MapBox Dark v10",
 	iconUrl: './icon/mapBoxDark.png',
 	tooltip: 'MapBox Dark v10 Tiles',
-	category: 'Offline',
 	creationFunction: function() {
 		return new Cesium.UrlTemplateImageryProvider({
-			url: 'https://tile.datr.dev/data/mapbox-dark-v10/{z}/{x}/{y}.png',
+			url: config['map']['tile_server']['mapbox_dark'] + '{z}/{x}/{y}.png',
       credit: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
-			maximumLevel: 16,
-		});
-	}
-}));
-
-imageryProviders.push(new Cesium.ProviderViewModel({
-	name: "ESRI",
-	iconUrl: './icon/esri.jpg',
-	tooltip: 'ESRI Tiles',
-	category: 'Offline',
-	creationFunction: function() {
-		return new Cesium.UrlTemplateImageryProvider({
-			url: 'https://tile.datr.dev/data/esri/{z}/{x}/{y}.jpg',
-      credit: 'Esri, Maxar, Earthstar Geographics, USDA FSA, USGS, Aerogrid, IGN, IGP, and the GIS User Community',
 			maximumLevel: 16,
 		});
 	}
@@ -65,10 +81,9 @@ imageryProviders.push(new Cesium.ProviderViewModel({
 	name: "OpenTopoMap",
 	iconUrl: './icon/opentopomap.png',
 	tooltip: 'OpenTopoMap Tiles',
-	category: 'Offline',
 	creationFunction: function() {
 		return new Cesium.UrlTemplateImageryProvider({
-			url: 'https://tile.datr.dev/data/opentopomap/{z}/{x}/{y}.png',
+			url: config['map']['tile_server']['opentopomap'] + '{z}/{x}/{y}.png',
       credit: '<code>Kartendaten: © <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende, SRTM | Kartendarstellung: © <a href="http://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)</code>',
 			maximumLevel: 8,
 		});
@@ -81,7 +96,6 @@ terrainProviders.push(new Cesium.ProviderViewModel({
 	name: "WGS84 Ellipsoid",
 	iconUrl: './icon/opentopomap.png',
 	tooltip: 'WGS84 Ellipsoid Terrain',
-	category: 'Offline',
 	creationFunction: function() {
 		return new Cesium.EllipsoidTerrainProvider({
 		});
@@ -92,7 +106,6 @@ terrainProviders.push(new Cesium.ProviderViewModel({
 	name: "30m Adelaide",
 	iconUrl: './icon/opentopomap.png',
 	tooltip: '30m Adelaide Terrain',
-	category: 'Offline',
 	creationFunction: function() {
 		return Cesium.CesiumTerrainProvider.fromUrl(
       'https://terrain.datr.dev/data/30m_adelaide/'
@@ -104,7 +117,6 @@ terrainProviders.push(new Cesium.ProviderViewModel({
 	name: "90m Australia",
 	iconUrl: './icon/opentopomap.png',
 	tooltip: '90m Australia Terrain',
-	category: 'Offline',
 	creationFunction: function() {
 		return Cesium.CesiumTerrainProvider.fromUrl(
       'https://terrain.datr.dev/data/90m_australia/'
@@ -116,7 +128,6 @@ terrainProviders.push(new Cesium.ProviderViewModel({
 	name: "90m South Australia",
 	iconUrl: './icon/opentopomap.png',
 	tooltip: '90m South Australia Terrain',
-	category: 'Offline',
 	creationFunction: function() {
 		return Cesium.CesiumTerrainProvider.fromUrl(
       'https://terrain.datr.dev/data/90m_south_australia/'
